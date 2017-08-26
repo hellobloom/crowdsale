@@ -1,6 +1,5 @@
-const mnemonic =
-  process.env.TEST_MNETONIC ||
-  "burger burger burger burger burger burger burger burger burger burger burger burger";
+require("babel-register");
+require("babel-polyfill");
 
 module.exports = {
   networks: {
@@ -14,6 +13,5 @@ module.exports = {
       provider: require("ethereumjs-testrpc").provider({ gasLimit: 100000000 }),
       network_id: "*"
     }
-  },
-  build: {}
+  }
 };
