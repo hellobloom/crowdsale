@@ -7,9 +7,9 @@ contract("Bloom", function(accounts) {
     token = await Bloom.new();
   });
 
-  it("allocates a supply of 10k BLT", async function() {
+  it("allocates a supply of 150 million BLT", async function() {
     let totalSupply = await token.totalSupply();
 
-    assert.equal(totalSupply, 500);
+    assert.equal(totalSupply, 150000000);
   });
 });
