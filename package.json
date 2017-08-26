@@ -1,0 +1,14 @@
+{
+  "name": "bloom-crowdsale",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "John Backus <johncbackus@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "truffle": "^3.4.9",
+    "zeppelin-solidity": "^1.2.0"
+  },
+  "devDependencies": {
+    "ethereumjs-testrpc": "^4.1.1"
+  }
+}
