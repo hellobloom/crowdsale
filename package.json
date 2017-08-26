@@ -5,6 +5,7 @@
   "author": "John Backus <johncbackus@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "minimetoken": "^0.1.7",
     "truffle": "^3.4.9",
     "zeppelin-solidity": "^1.2.0"
   },
