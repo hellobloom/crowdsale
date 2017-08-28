@@ -24,7 +24,7 @@ contract TestBloom {
     sale.setToken(address(bloom));
 
     uint256 totalBefore = sale.token().totalSupply();
-    sale.allocateSupply(500);
+    sale.allocateSupply();
     uint256 totalAfter = sale.token().totalSupply();
 
     Assert.equal(
@@ -35,8 +35,8 @@ contract TestBloom {
 
     Assert.equal(
       totalAfter,
-      500,
-      "The supply should be 500 after calling allocateSupply()"
+      15e10,
+      "The supply should be 15M after calling allocateSupply()"
     );
 
     Assert.equal(
@@ -47,7 +47,7 @@ contract TestBloom {
 
     Assert.equal(
       sale.token().balanceOf(address(sale)),
-      500,
+      15e10,
       "Token controller should be allocated the initial tokens"
     );
   }
@@ -58,21 +58,21 @@ contract TestBloom {
     throwProxy.assertThrows("Should throw when non-owner tries to setToken");
   }
 
-  function testOwnerOnlyAllocateSupply() {
-    TestBloom(throwProxy).throwsWhenNonOwnerAllocatesSupply();
-
-    throwProxy.assertThrows("Should throw when non-owner tries to allocateSupply");
-  }
-
   function throwsWhenNonOwnerSetsToken() {
     BloomTokenSale sale = BloomTokenSale(DeployedAddresses.BloomTokenSale());
 
     sale.setToken(address(this));
   }
 
+  function testOwnerOnlyAllocateSupply() {
+    TestBloom(throwProxy).throwsWhenNonOwnerAllocatesSupply();
+
+    throwProxy.assertThrows("Should throw when non-owner tries to allocateSupply");
+  }
+
   function throwsWhenNonOwnerAllocatesSupply() {
     BloomTokenSale sale = BloomTokenSale(DeployedAddresses.BloomTokenSale());
 
-    sale.allocateSupply(500);
+    sale.allocateSupply();
   }
 }
