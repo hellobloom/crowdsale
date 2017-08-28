@@ -24,7 +24,7 @@ contract TestBloom {
     sale.setToken(address(bloom));
 
     uint256 totalBefore = sale.token().totalSupply();
-    sale.allocateSupply();
+    sale.allocateSupply(500);
     uint256 totalAfter = sale.token().totalSupply();
 
     Assert.equal(
@@ -37,6 +37,18 @@ contract TestBloom {
       totalAfter,
       500,
       "The supply should be 500 after calling allocateSupply()"
+    );
+
+    Assert.equal(
+      sale.token().balanceOf(address(0)),
+      0,
+      "Non-owner addresses should have a balance of zero"
+    );
+
+    Assert.equal(
+      sale.token().balanceOf(address(sale)),
+      500,
+      "Token controller should be allocated the initial tokens"
     );
   }
 
@@ -61,6 +73,6 @@ contract TestBloom {
   function throwsWhenNonOwnerAllocatesSupply() {
     BloomTokenSale sale = BloomTokenSale(DeployedAddresses.BloomTokenSale());
 
-    sale.allocateSupply();
+    sale.allocateSupply(500);
   }
 }

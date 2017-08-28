@@ -13,7 +13,7 @@ contract BloomTokenSale is Ownable {
     token = Bloom(_token);
   }
 
-  function allocateSupply() onlyOwner {
-    token.generateTokens(address(this), 500);
+  function allocateSupply(uint _amount) onlyOwner {
+    token.generateTokens(address(this), _amount);
   }
 }
