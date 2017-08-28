@@ -1,4 +1,4 @@
-pragma solidity ^0.4.5;
+pragma solidity ^0.4.10;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
@@ -8,7 +8,7 @@ import "../contracts/BloomTokenSale.sol";
 import "zeppelin-solidity/contracts/token/ERC20.sol";
 import "./helpers/ThrowProxy.sol";
 
-contract TestBloom {
+contract TestBloomTokenSale {
   uint256 public initialBalance = 1 ether;
 
   ThrowProxy throwProxy;
@@ -53,7 +53,7 @@ contract TestBloom {
   }
 
   function testOwnerOnlySetToken() {
-    TestBloom(throwProxy).throwsWhenNonOwnerSetsToken();
+    TestBloomTokenSale(throwProxy).throwsWhenNonOwnerSetsToken();
 
     throwProxy.assertThrows("Should throw when non-owner tries to setToken");
   }
@@ -65,7 +65,7 @@ contract TestBloom {
   }
 
   function testOwnerOnlyAllocateSupply() {
-    TestBloom(throwProxy).throwsWhenNonOwnerAllocatesSupply();
+    TestBloomTokenSale(throwProxy).throwsWhenNonOwnerAllocatesSupply();
 
     throwProxy.assertThrows("Should throw when non-owner tries to allocateSupply");
   }
@@ -82,7 +82,7 @@ contract TestBloom {
     bloom.changeController(address(sale));
     sale.setToken(address(bloom));
 
-    sale.call.value(10000 wei)();
+    assert(sale.call.value(10000 wei)());
 
     Assert.equal(
       sale.token().balanceOf(address(this)),
