@@ -1,8 +1,8 @@
-pragma solidity ^0.4.5;
+pragma solidity ^0.4.15;
 
 // import "zeppelin-solidity/contracts/token/StandardToken.sol";
 import "minimetoken/contracts/MiniMeToken.sol";
-import "./ConvertLib.sol";
+// import "./ConvertLib.sol";
 // import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 // import "zeppelin-solidity/contracts/crowdsale/RefundableCrowdsale.sol";
 // import "zeppelin-solidity/contracts/crowdsale/CappedCrowdsale.sol";
@@ -16,9 +16,7 @@ contract Bloom is MiniMeToken {
     18,            // Decimals
     "BLT",         // Symbol
     true           // Enable transfers
-  ) {
-    changeController(_tokenFactory);
-  }
+  ) {}
 }
 
 // contract BloomSale is RefundableCrowdsale, CappedCrowdsale, Pausable {

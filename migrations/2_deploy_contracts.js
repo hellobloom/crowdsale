@@ -5,31 +5,31 @@ var ConvertLib = artifacts.require("./ConvertLib.sol");
 var MetaCoin = artifacts.require("./MetaCoin.sol");
 var MiniMeTokenFactory = artifacts.require("MiniMeTokenFactory");
 var Bloom = artifacts.require("./Bloom.sol");
+var BloomTokenSale = artifacts.require("./BloomTokenSale.sol");
 
 module.exports = function deploy(deployer) {
-  deployer.deploy(ConvertLib);
-  deployer.link(ConvertLib, Bloom);
-
   deployer.deploy(MiniMeTokenFactory);
-  deployer.deploy(
-    Bloom,
-    0,
-    9000000,
-    "0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
-    "0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
-    100,
-    66,
-    2,
-    "0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef"
-  );
+  deployer.deploy(Bloom);
 
-  MiniMeTokenFactory.deployed().then(() => {
+  deployer.deploy(BloomTokenSale).then(() => {
     return MiniMeTokenFactory.deployed()
-      .then(factory => {
+      .then(f => {
+        factory = f;
+        return BloomTokenSale.deployed();
+      })
+      .then(s => {
+        sale = s;
         return Bloom.new(factory.address);
       })
-      .then(bloom => {
-        factory.generateTokens();
+      .then(b => {
+        bloom = b;
+        return Bloom.deployed();
+      })
+      .then(() => {
+        return bloom.changeController(sale.address);
+      })
+      .then(() => {
+        return sale.setToken(bloom.address);
       });
   });
 };

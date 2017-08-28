@@ -1,4 +1,4 @@
-const Bloom = artifacts.require("./../contracts//Bloom.sol");
+const Bloom = artifacts.require("./../contracts/Bloom.sol");
 
 contract("Bloom", function(accounts) {
   let token;
