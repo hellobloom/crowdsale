@@ -1,0 +1,30 @@
+#!/bin/bash
+
+abi_summary() {
+  local schema_file="$1";
+
+  cat "$schema_file" | jq -r '
+    .abi |
+    map(select(.type == "function")) | # Select only functions
+    map(                               # Concatenate arguments and wrap in parens
+      .name +
+      "(" + (
+        .inputs |
+        map(.type + " " + .name) |
+        join(", ")
+      ) + ")"
+    ) |
+    .[]
+  '
+}
+
+indent() {
+  sed 's/^/  /'
+}
+
+echo "Bloom"
+abi_summary build/contracts/Bloom.json | indent
+echo
+
+echo "BloomSale"
+abi_summary build/contracts/BloomTokenSale.json | indent
