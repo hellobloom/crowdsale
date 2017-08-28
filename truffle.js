@@ -10,7 +10,8 @@ module.exports = {
       gas: 1e8
     },
     test: {
-      provider: require("ethereumjs-testrpc").provider({ gasLimit: 100000000 }),
+      provider: require("ethereumjs-testrpc").provider({ gasLimit: 1e8 }),
+      gas: 1e8,
       network_id: "*"
     }
   }
