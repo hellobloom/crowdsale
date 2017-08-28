@@ -6,17 +6,26 @@ import "minimetoken/contracts/MiniMeToken.sol";
 import "../contracts/Bloom.sol";
 import "../contracts/BloomTokenSale.sol";
 import "zeppelin-solidity/contracts/token/ERC20.sol";
+import "./helpers/ThrowProxy.sol";
 
 contract TestBloom {
+  uint256 public initialBalance = 1 ether;
+
+  ThrowProxy throwProxy;
+
+  function beforeEach() {
+    throwProxy = new ThrowProxy(address(this));
+  }
+
   function testTotalSupplyUsingDeployedContract() {
-    Bloom bloom = Bloom(DeployedAddresses.Bloom());
-    BloomTokenSale sale = BloomTokenSale(DeployedAddresses.BloomTokenSale());
+    Bloom bloom = new Bloom(new MiniMeTokenFactory());
+    BloomTokenSale sale = new BloomTokenSale();
+    bloom.changeController(address(sale));
+    sale.setToken(address(bloom));
 
-    uint256 totalBefore = ERC20(sale.token()).totalSupply();
-
+    uint256 totalBefore = sale.token().totalSupply();
     sale.allocateSupply();
-
-    uint256 totalAfter = ERC20(sale.token()).totalSupply();
+    uint256 totalAfter = sale.token().totalSupply();
 
     Assert.equal(
       totalBefore,
@@ -29,5 +38,29 @@ contract TestBloom {
       500,
       "The supply should be 500 after calling allocateSupply()"
     );
+  }
+
+  function testOwnerOnlySetToken() {
+    TestBloom(throwProxy).throwsWhenNonOwnerSetsToken();
+
+    throwProxy.assertThrows("Should throw when non-owner tries to setToken");
+  }
+
+  function testOwnerOnlyAllocateSupply() {
+    TestBloom(throwProxy).throwsWhenNonOwnerAllocatesSupply();
+
+    throwProxy.assertThrows("Should throw when non-owner tries to allocateSupply");
+  }
+
+  function throwsWhenNonOwnerSetsToken() {
+    BloomTokenSale sale = BloomTokenSale(DeployedAddresses.BloomTokenSale());
+
+    sale.setToken(address(this));
+  }
+
+  function throwsWhenNonOwnerAllocatesSupply() {
+    BloomTokenSale sale = BloomTokenSale(DeployedAddresses.BloomTokenSale());
+
+    sale.allocateSupply();
   }
 }
