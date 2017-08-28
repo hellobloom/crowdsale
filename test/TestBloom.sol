@@ -75,4 +75,25 @@ contract TestBloom {
 
     sale.allocateSupply();
   }
+
+  function testPurchase() {
+    Bloom bloom = new Bloom(new MiniMeTokenFactory());
+    BloomTokenSale sale = new BloomTokenSale();
+    bloom.changeController(address(sale));
+    sale.setToken(address(bloom));
+
+    sale.call.value(10000 wei)();
+
+    Assert.equal(
+      sale.token().balanceOf(address(this)),
+      10,
+      "Expected 10,000 wei to buy me 10 tokens"
+    );
+
+    Assert.equal(
+      sale.balance,
+      10000 wei,
+      "Expected a 10k balance in the sale"
+    );
+  }
 }

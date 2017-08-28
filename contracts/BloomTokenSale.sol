@@ -21,4 +21,12 @@ contract BloomTokenSale is Ownable {
   function allocateSupply() onlyOwner {
     token.generateTokens(address(this), TOTAL_SUPPLY);
   }
+
+  function () public payable {
+    return doPayment(msg.sender);
+  }
+
+  function doPayment(address _owner) internal {
+    token.generateTokens(_owner, msg.value.div(1000));
+  }
 }
