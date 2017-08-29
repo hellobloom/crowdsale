@@ -1,4 +1,4 @@
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.15;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
@@ -9,7 +9,7 @@ import "zeppelin-solidity/contracts/token/ERC20.sol";
 import "./helpers/ThrowProxy.sol";
 
 contract TestBloomTokenSale {
-  uint256 public initialBalance = 1 ether;
+  uint256 public initialBalance = 200 finney;
 
   ThrowProxy throwProxy;
 
@@ -19,7 +19,7 @@ contract TestBloomTokenSale {
 
   function testTotalSupplyUsingDeployedContract() {
     Bloom bloom = new Bloom(new MiniMeTokenFactory());
-    BloomTokenSale sale = new BloomTokenSale();
+    BloomTokenSale sale = new BloomTokenSale(block.number + 1, 10000000, 1000, 0x1);
     bloom.changeController(address(sale));
     sale.setToken(address(bloom));
 
@@ -78,11 +78,12 @@ contract TestBloomTokenSale {
 
   function testPurchase() {
     Bloom bloom = new Bloom(new MiniMeTokenFactory());
-    BloomTokenSale sale = new BloomTokenSale();
+    BloomTokenSale sale = new BloomTokenSale(block.number, 10000000, 1000, 0x1);
     bloom.changeController(address(sale));
     sale.setToken(address(bloom));
+    sale.allocateSupply();
 
-    assert(sale.call.value(10000 wei)());
+    require(sale.call.value(10000 wei)());
 
     Assert.equal(
       sale.token().balanceOf(address(this)),
@@ -91,7 +92,7 @@ contract TestBloomTokenSale {
     );
 
     Assert.equal(
-      sale.balance,
+      address(0x1).balance,
       10000 wei,
       "Expected a 10k balance in the sale"
     );
