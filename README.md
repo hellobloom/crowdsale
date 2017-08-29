@@ -1,5 +1,4 @@
-# Halo ICO
-
+# Bloom ICO
 
 ## Requirements
 
