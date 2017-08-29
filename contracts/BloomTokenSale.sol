@@ -6,7 +6,7 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Crowdsale.sol";
 import "./Bloom.sol";
 
-contract BloomTokenSale is Crowdsale, Ownable {
+contract BloomTokenSale is Crowdsale, Ownable, TokenController {
   using SafeMath for uint256;
 
   Bloom public token;
@@ -32,6 +32,18 @@ contract BloomTokenSale is Crowdsale, Ownable {
     token.transferFrom(address(this), _beneficiary, _weiAmount.div(1000));
   }
 
-  function onTransfer(address _from, address _to, uint256 _amount) {
+  // Required interface of MiniMeToken
+
+  function proxyPayment(address _owner) payable returns(bool) {
+    buyTokens(_owner);
+    return true;
+  }
+
+  function onTransfer(address _from, address _to, uint _amount) returns(bool) {
+    return true;
+  }
+
+  function onApprove(address _owner, address _spender, uint _amount) returns(bool) {
+    return true;
   }
 }
