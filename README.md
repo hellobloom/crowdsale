@@ -1,4 +1,4 @@
-# Bloom ICO
+# Bloom Token
 
 ## Requirements
 
