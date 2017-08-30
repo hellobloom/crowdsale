@@ -9,7 +9,7 @@ import "zeppelin-solidity/contracts/token/ERC20.sol";
 import "./helpers/ThrowProxy.sol";
 
 contract TestBloomTokenSale {
-  uint256 public initialBalance = 200 finney;
+  uint256 public initialBalance = 10 ether;
 
   ThrowProxy throwProxy;
 
@@ -35,7 +35,7 @@ contract TestBloomTokenSale {
 
     Assert.equal(
       totalAfter,
-      15e10,
+      15e25,
       "The supply should be 15M after calling allocateSupply()"
     );
 
@@ -47,7 +47,7 @@ contract TestBloomTokenSale {
 
     Assert.equal(
       sale.token().balanceOf(address(sale)),
-      15e10,
+      15e25,
       "Token controller should be allocated the initial tokens"
     );
   }
@@ -78,23 +78,26 @@ contract TestBloomTokenSale {
 
   function testPurchase() {
     Bloom bloom = new Bloom(new MiniMeTokenFactory());
-    BloomTokenSale sale = new BloomTokenSale(block.number, 10000000, 1000, 0x1);
+    uint tokenUnitsPerWei = 1000;
+    BloomTokenSale sale = new BloomTokenSale(block.number, 10000000, tokenUnitsPerWei, 0x1);
     bloom.changeController(address(sale));
     sale.setToken(address(bloom));
     sale.allocateSupply();
 
-    require(sale.call.value(10000 wei)());
+    uint purchaseAmount = 5 wei;
+
+    require(sale.call.value(purchaseAmount)());
 
     Assert.equal(
       sale.token().balanceOf(address(this)),
-      10,
-      "Expected 10,000 wei to buy me 10 tokens"
+      purchaseAmount * 1000,
+      "Expected 5 wei to buy me 5000 token units"
     );
 
     Assert.equal(
       address(0x1).balance,
-      10000 wei,
-      "Expected a 10k balance in the sale"
+      purchaseAmount,
+      "Expected a 5 wei balance in the sale address"
     );
   }
 }

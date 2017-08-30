@@ -11,7 +11,7 @@ contract BloomTokenSale is Crowdsale, Ownable, TokenController {
 
   Bloom public token;
 
-  uint public constant TOTAL_SUPPLY = 15e10;
+  uint public constant TOTAL_SUPPLY = 15e25; // 150 million BLT with 18 decimals
 
   function BloomTokenSale(
     uint256 _startBlock,
@@ -29,7 +29,7 @@ contract BloomTokenSale is Crowdsale, Ownable, TokenController {
   }
 
   function allocateTokens(address _beneficiary, uint256 _weiAmount) private {
-    token.transferFrom(address(this), _beneficiary, _weiAmount.div(1000));
+    token.transferFrom(address(this), _beneficiary, _weiAmount.mul(rate));
   }
 
   // Required interface of MiniMeToken
