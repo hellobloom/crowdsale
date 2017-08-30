@@ -2,7 +2,6 @@ require("babel-register");
 require("babel-polyfill");
 
 var ConvertLib = artifacts.require("./ConvertLib.sol");
-var MetaCoin = artifacts.require("./MetaCoin.sol");
 var MiniMeTokenFactory = artifacts.require("MiniMeTokenFactory");
 var Bloom = artifacts.require("./Bloom.sol");
 var BloomTokenSale = artifacts.require("./BloomTokenSale.sol");
