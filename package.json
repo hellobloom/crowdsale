@@ -4,6 +4,9 @@
   "main": "index.js",
   "author": "John Backus <johncbackus@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "truffle test --network test"
+  },
   "dependencies": {
     "minimetoken": "^0.1.7",
     "truffle": "^3.4.9",
