@@ -3,16 +3,22 @@ pragma solidity ^0.4.15;
 import "minimetoken/contracts/MiniMeToken.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./Crowdsale.sol";
 import "./Bloom.sol";
 
-contract BloomTokenSale is Ownable {
-  using SafeMath for uint;
+contract BloomTokenSale is Crowdsale, Ownable, TokenController {
+  using SafeMath for uint256;
 
   Bloom public token;
 
   uint public constant TOTAL_SUPPLY = 15e10;
 
-  function BloomTokenSale() {}
+  function BloomTokenSale(
+    uint256 _startBlock,
+    uint256 _endBlock,
+    uint256 _rate,
+    address _wallet
+  ) Crowdsale(_startBlock, _endBlock, _rate, _wallet) {}
 
   function setToken(address _token) onlyOwner {
     token = Bloom(_token);
@@ -22,11 +28,22 @@ contract BloomTokenSale is Ownable {
     token.generateTokens(address(this), TOTAL_SUPPLY);
   }
 
-  function () public payable {
-    return doPayment(msg.sender);
+  function allocateTokens(address _beneficiary, uint256 _weiAmount) private {
+    token.transferFrom(address(this), _beneficiary, _weiAmount.div(1000));
   }
 
-  function doPayment(address _owner) internal {
-    token.generateTokens(_owner, msg.value.div(1000));
+  // Required interface of MiniMeToken
+
+  function proxyPayment(address _owner) payable returns(bool) {
+    buyTokens(_owner);
+    return true;
+  }
+
+  function onTransfer(address _from, address _to, uint _amount) returns(bool) {
+    return true;
+  }
+
+  function onApprove(address _owner, address _spender, uint _amount) returns(bool) {
+    return true;
   }
 }

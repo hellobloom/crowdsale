@@ -10,25 +10,32 @@ module.exports = function deploy(deployer) {
   deployer.deploy(MiniMeTokenFactory);
   deployer.deploy(Bloom);
 
-  deployer.deploy(BloomTokenSale).then(() => {
-    return MiniMeTokenFactory.deployed()
-      .then(f => {
-        factory = f;
-        return BloomTokenSale.deployed();
-      })
-      .then(s => {
-        sale = s;
-        return Bloom.new(factory.address);
-      })
-      .then(b => {
-        bloom = b;
-        return Bloom.deployed();
-      })
+  var now = new Date().valueOf();
+  web3.eth.getBlockNumber((error, blockNumber) => {
+    deployer
+      .deploy(BloomTokenSale, blockNumber + 10, 10000000, 1000, "0x1")
       .then(() => {
-        return bloom.changeController(sale.address);
+        return MiniMeTokenFactory.deployed()
+          .then(f => {
+            factory = f;
+            return BloomTokenSale.deployed();
+          })
+          .then(s => {
+            sale = s;
+            return Bloom.new(factory.address);
+          })
+          .then(b => {
+            bloom = b;
+            return Bloom.deployed();
+          })
+          .then(() => {
+            return bloom.changeController(sale.address);
+          })
+          .then(() => {
+            return sale.setToken(bloom.address);
+          })
+          .catch(console.log);
       })
-      .then(() => {
-        return sale.setToken(bloom.address);
-      });
+      .catch(error => console.log("Error: ", error));
   });
 };
