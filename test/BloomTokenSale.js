@@ -59,6 +59,25 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     controllerBalanceAfter.should.be.bignumber.equal("15e25");
   });
 
+  it("only allows the owner to allocate supply", async function() {
+    const sale = await BloomTokenSale.new(
+      1000,
+      2000,
+      new BigNumber(1000),
+      wallet
+    );
+
+    const token = await Bloom.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+
+    sale
+      .allocateSupply({ from: purchaser })
+      .should.be.rejectedWith("invalid opcode");
+
+    sale.allocateSupply().should.be.fulfilled;
+  });
+
   it("only allows the owner to set the token", async function() {
     const sale = await BloomTokenSale.new(
       1000,

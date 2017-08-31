@@ -17,24 +17,6 @@ contract TestBloomTokenSale {
     throwProxy = new ThrowProxy(address(this));
   }
 
-  function throwsWhenNonOwnerSetsToken() {
-    BloomTokenSale sale = BloomTokenSale(DeployedAddresses.BloomTokenSale());
-
-    sale.setToken(address(this));
-  }
-
-  function testOwnerOnlyAllocateSupply() {
-    TestBloomTokenSale(throwProxy).throwsWhenNonOwnerAllocatesSupply();
-
-    throwProxy.assertThrows("Should throw when non-owner tries to allocateSupply");
-  }
-
-  function throwsWhenNonOwnerAllocatesSupply() {
-    BloomTokenSale sale = BloomTokenSale(DeployedAddresses.BloomTokenSale());
-
-    sale.allocateSupply();
-  }
-
   function testPurchase() {
     Bloom bloom = new Bloom(new MiniMeTokenFactory());
     uint tokenUnitsPerWei = 1000;
