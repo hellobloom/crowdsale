@@ -1,7 +1,7 @@
 {
   "name": "bloom-crowdsale",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "truffle.js",
   "author": "John Backus <johncbackus@gmail.com>",
   "license": "MIT",
   "scripts": {
