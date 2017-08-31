@@ -230,4 +230,48 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     hasEnded1.should.equal(false);
     hasEnded2.should.equal(true);
   });
+
+  it("rejects a sale with an endBlock before the startDate", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    BloomTokenSale.new(
+      latestBlock + 2,
+      latestBlock + 1,
+      new BigNumber(1000),
+      wallet
+    ).should.be.rejectedWith("invalid opcode");
+  });
+
+  it("rejects a sale with a startDate before the current block", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    BloomTokenSale.new(
+      latestBlock - 1,
+      latestBlock,
+      new BigNumber(1000),
+      wallet
+    ).should.be.rejectedWith("invalid opcode");
+  });
+
+  it("requires a positive rate", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    BloomTokenSale.new(
+      latestBlock + 1,
+      latestBlock + 1,
+      new BigNumber(0),
+      wallet
+    ).should.be.rejectedWith("invalid opcode");
+  });
+
+  it("rejects a null wallet", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    BloomTokenSale.new(
+      latestBlock + 1,
+      latestBlock + 1,
+      new BigNumber(1000),
+      "0x0"
+    ).should.be.rejectedWith("invalid opcode");
+  });
 });
