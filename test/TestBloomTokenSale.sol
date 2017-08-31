@@ -17,41 +17,6 @@ contract TestBloomTokenSale {
     throwProxy = new ThrowProxy(address(this));
   }
 
-  function testTotalSupplyUsingDeployedContract() {
-    Bloom bloom = new Bloom(new MiniMeTokenFactory());
-    BloomTokenSale sale = new BloomTokenSale(block.number + 1, 10000000, 1000, 0x1);
-    bloom.changeController(address(sale));
-    sale.setToken(address(bloom));
-
-    uint256 totalBefore = sale.token().totalSupply();
-    sale.allocateSupply();
-    uint256 totalAfter = sale.token().totalSupply();
-
-    Assert.equal(
-      totalBefore,
-      0,
-      "The total supply should start at zero tokens."
-    );
-
-    Assert.equal(
-      totalAfter,
-      15e25,
-      "The supply should be 15M after calling allocateSupply()"
-    );
-
-    Assert.equal(
-      sale.token().balanceOf(address(0)),
-      0,
-      "Non-owner addresses should have a balance of zero"
-    );
-
-    Assert.equal(
-      sale.token().balanceOf(address(sale)),
-      15e25,
-      "Token controller should be allocated the initial tokens"
-    );
-  }
-
   function testOwnerOnlySetToken() {
     TestBloomTokenSale(throwProxy).throwsWhenNonOwnerSetsToken();
 
