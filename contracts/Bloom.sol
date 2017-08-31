@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 // import "zeppelin-solidity/contracts/token/StandardToken.sol";
-import "minimetoken/contracts/MiniMeToken.sol";
+import "./vendor/minimetoken/contracts/MiniMeToken.sol";
 // import "./ConvertLib.sol";
 // import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 // import "zeppelin-solidity/contracts/crowdsale/RefundableCrowdsale.sol";

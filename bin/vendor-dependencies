@@ -6,26 +6,25 @@
 
 require 'pathname'
 
+root_dir = Pathname.new(__dir__).parent.expand_path
+
 mapping =
   Pathname
     .glob('./contracts/**/*.sol')
     .flat_map do |path|
       path.read.scan(%r{^import "./vendor/(.+)";$}).flatten
     end.uniq.map do |dependency|
-      root_dir = Pathname.new(__dir__).parent.expand_path
       target = root_dir.join('contracts', 'vendor', dependency)
       source = root_dir.join('node_modules', dependency)
 
       [source, target]
     end.to_h
 
-system('yarn')
+system('yarn > /dev/null')
 
 require 'fileutils'
 mapping.each do |source, target|
-  p target.dirname
+  puts "Copying #{source.relative_path_from(root_dir)} -> #{target.relative_path_from(root_dir)}"
   target.dirname.mkpath
-  p source
-  p target
   FileUtils.cp(source, target)
 end
