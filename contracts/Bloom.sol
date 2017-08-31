@@ -10,6 +10,6 @@ contract Bloom is MiniMeToken {
     "Bloom Token", // Token name
     18,            // Decimals
     "BLT",         // Symbol
-    true           // Enable transfers
+    false           // Enable transfers
   ) {}
 }

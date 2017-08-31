@@ -1,4 +1,4 @@
-import { advanceBlock } from "./helpers/advanceToBlock";
+import { advanceBlock, advanceToBlock } from "./helpers/advanceToBlock";
 
 const BigNumber = web3.BigNumber;
 
@@ -211,5 +211,23 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     token
       .approve(investor, 5, { from: sale })
       .should.be.rejectedWith("invalid opcode");
+  });
+
+  it("provides a helper method for checking if the sale has ended", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    const sale = await BloomTokenSale.new(
+      latestBlock + 2,
+      latestBlock + 2,
+      new BigNumber(1000),
+      wallet
+    );
+
+    const hasEnded1 = await sale.hasEnded();
+    await advanceToBlock(latestBlock + 3);
+    const hasEnded2 = await sale.hasEnded();
+
+    hasEnded1.should.equal(false);
+    hasEnded2.should.equal(true);
   });
 });
