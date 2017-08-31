@@ -11,52 +11,43 @@ const BloomTokenSale = artifacts.require("BloomTokenSale");
 const Bloom = artifacts.require("Bloom");
 
 contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
+  const createSale = async function(startBlock, endBlock) {
+    const sale = await BloomTokenSale.new(
+      startBlock,
+      endBlock,
+      new BigNumber(1000),
+      wallet
+    );
+
+    const token = await Bloom.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
+
+    return { sale, token };
+  };
+
   before(async function() {
     //Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
     await advanceBlock();
   });
 
-  it("should allow creator to change the controller", async function() {
-    const latestBlock = web3.eth.getBlock("latest").number;
-
-    this.sale = await BloomTokenSale.new(
-      latestBlock + 1,
-      latestBlock + 10,
-      new BigNumber(1000),
-      wallet
-    );
-
-    this.token = await Bloom.new();
-    await this.token.changeController(this.sale.address);
-
-    const owner = await this.token.controller();
-    owner.should.equal(this.sale.address);
-  });
-
   it("rejects payments that come before the starting block", async function() {
     const latestBlock = web3.eth.getBlock("latest").number;
-
-    this.sale = await BloomTokenSale.new(
-      // Each transaction that follows is a new block and the early payment
-      // attempt is the sixth transaction so we start seven blocks ahead
+    const { sale, token } = await createSale(
+      // The early payment attempt is the sixth transaction in this test
+      // so we start the sale seven blocks ahead
       latestBlock + 7,
-      latestBlock + 1000,
-      new BigNumber(1000),
-      wallet
+      latestBlock + 1000
     );
 
-    this.token = await Bloom.new();
-    await this.token.changeController(this.sale.address);
-    await this.sale.setToken(this.token.address);
-    await this.sale.allocateSupply();
-
-    await this.sale
+    await sale
       .sendTransaction({ value: 1000, from: purchaser })
       .should.be.rejectedWith("invalid opcode");
 
     await advanceBlock();
 
-    await this.sale.sendTransaction({
+    await sale.sendTransaction({
       value: 1000,
       from: purchaser
     }).should.be.fulfilled;
@@ -65,26 +56,19 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("rejects payments that come after the ending block", async function() {
     const latestBlock = web3.eth.getBlock("latest").number;
 
-    this.sale = await BloomTokenSale.new(
-      // Each transaction that follows is a new block and the late payment
-      // attempt is the seventh transaction so we start seven blocks ahead
+    const { sale } = await createSale(
       latestBlock + 1,
-      latestBlock + 6,
-      new BigNumber(1000),
-      wallet
+      // The late payment attempt is the seventh transaction in this test
+      // so we end the sale seven blocks ahead
+      latestBlock + 6
     );
 
-    this.token = await Bloom.new();
-    await this.token.changeController(this.sale.address);
-    await this.sale.setToken(this.token.address);
-    await this.sale.allocateSupply();
-
-    await this.sale.sendTransaction({
+    await sale.sendTransaction({
       value: 1000,
       from: purchaser
     }).should.be.fulfilled;
 
-    await this.sale
+    await sale
       .sendTransaction({ value: 1000, from: purchaser })
       .should.be.rejectedWith("invalid opcode");
   });
