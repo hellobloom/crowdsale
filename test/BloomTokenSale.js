@@ -11,7 +11,7 @@ const BloomTokenSale = artifacts.require("BloomTokenSale");
 const Bloom = artifacts.require("Bloom");
 
 contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
-  const createSale = async function(startBlock, endBlock) {
+  const createSaleWithToken = async function(startBlock, endBlock) {
     const sale = await BloomTokenSale.new(
       startBlock,
       endBlock,
@@ -32,9 +32,70 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await advanceBlock();
   });
 
+  it("allocates initial supply of tokens to controller's address", async function() {
+    const sale = await BloomTokenSale.new(
+      10000,
+      20000,
+      new BigNumber(1000),
+      wallet
+    );
+
+    const token = await Bloom.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+
+    const supplyBefore = await token.totalSupply();
+    const controllerBalanceBefore = await token.balanceOf(sale.address);
+
+    await sale.allocateSupply();
+
+    const supplyAfter = await token.totalSupply();
+    const controllerBalanceAfter = await token.balanceOf(sale.address);
+
+    supplyBefore.should.be.bignumber.equal(0);
+    controllerBalanceBefore.should.be.bignumber.equal(0);
+
+    supplyAfter.should.be.bignumber.equal("15e25");
+    controllerBalanceAfter.should.be.bignumber.equal("15e25");
+  });
+
+  it("only allows the owner to allocate supply", async function() {
+    const sale = await BloomTokenSale.new(
+      1000,
+      2000,
+      new BigNumber(1000),
+      wallet
+    );
+
+    const token = await Bloom.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+
+    sale
+      .allocateSupply({ from: purchaser })
+      .should.be.rejectedWith("invalid opcode");
+
+    sale.allocateSupply().should.be.fulfilled;
+  });
+
+  it("only allows the owner to set the token", async function() {
+    const sale = await BloomTokenSale.new(
+      1000,
+      2000,
+      new BigNumber(1000),
+      wallet
+    );
+
+    sale
+      .setToken("0x0", { from: purchaser })
+      .should.be.rejectedWith("invalid opcode");
+
+    sale.setToken("0x0").should.be.fulfilled;
+  });
+
   it("rejects payments that come before the starting block", async function() {
     const latestBlock = web3.eth.getBlock("latest").number;
-    const { sale, token } = await createSale(
+    const { sale, token } = await createSaleWithToken(
       // The early payment attempt is the sixth transaction in this test
       // so we start the sale seven blocks ahead
       latestBlock + 7,
@@ -56,7 +117,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("rejects payments that come after the ending block", async function() {
     const latestBlock = web3.eth.getBlock("latest").number;
 
-    const { sale } = await createSale(
+    const { sale } = await createSaleWithToken(
       latestBlock + 1,
       // The late payment attempt is the seventh transaction in this test
       // so we end the sale seven blocks ahead
@@ -71,5 +132,26 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale
       .sendTransaction({ value: 1000, from: purchaser })
       .should.be.rejectedWith("invalid opcode");
+  });
+
+  it("transfers tokens from controller to sender on purchase", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    const { sale, token } = await createSaleWithToken(
+      latestBlock + 1,
+      latestBlock + 1000
+    );
+    const purchaserTokenAllocationBefore = await token.balanceOf(purchaser);
+    const walletBalanceBefore = web3.eth.getBalance(wallet);
+
+    await sale.sendTransaction({ value: 5, from: purchaser });
+
+    const purchaserTokenAllocationAfter = await token.balanceOf(purchaser);
+    const walletBalanceAfter = web3.eth.getBalance(wallet);
+
+    purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
+
+    purchaserTokenAllocationAfter.should.be.bignumber.equal(5000);
+    walletBalanceAfter.should.be.bignumber.equal(walletBalanceBefore.plus(5));
   });
 });
