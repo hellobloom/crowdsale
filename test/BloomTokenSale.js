@@ -193,4 +193,23 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     token.transfer(investor, 5, { from: sale }).should.be.fulfilled;
   });
+
+  it("does not allow anyone to spend other account's tokens", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    const { sale, token } = await createSaleWithToken(
+      latestBlock + 1,
+      latestBlock + 1000
+    );
+
+    await sale.sendTransaction({ value: 5, from: purchaser });
+
+    token
+      .approve(investor, 5, { from: purchaser })
+      .should.be.rejectedWith("invalid opcode");
+
+    token
+      .approve(investor, 5, { from: sale })
+      .should.be.rejectedWith("invalid opcode");
+  });
 });
