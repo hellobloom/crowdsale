@@ -34,9 +34,19 @@ contract BloomTokenSale is Crowdsale, Ownable, TokenController {
 
   // Required interface of MiniMeToken
 
-  function proxyPayment(address _owner) payable returns(bool) {
-    buyTokens(_owner);
-    return true;
+  // low level token purchase function
+  function proxyPayment(address beneficiary) payable returns (bool) {
+    require(beneficiary != 0x0);
+    require(validPurchase());
+
+    uint256 weiAmount = msg.value;
+
+    // update state
+    weiRaised = weiRaised.add(weiAmount);
+
+    allocateTokens(beneficiary, weiAmount);
+
+    return forwardFunds();
   }
 
   function onTransfer(address _from, address _to, uint _amount) returns(bool) {
