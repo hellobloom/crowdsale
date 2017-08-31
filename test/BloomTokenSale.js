@@ -28,6 +28,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
+    await sale.unpause();
 
     return { sale, token };
   };
@@ -54,6 +55,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const controllerBalanceBefore = await token.balanceOf(sale.address);
 
     await sale.allocateSupply();
+    await sale.unpause();
 
     const supplyAfter = await token.totalSupply();
     const controllerBalanceAfter = await token.balanceOf(sale.address);
@@ -103,10 +105,11 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
   it("rejects payments that come before the starting block", async function() {
     const latestBlock = web3.eth.getBlock("latest").number;
+
     const { sale, token } = await createSaleWithToken(
-      // The early payment attempt is the sixth transaction in this test
+      // The early payment attempt is the seventh transaction in this test
       // so we start the sale seven blocks ahead
-      latestBlock + 7,
+      latestBlock + 8,
       latestBlock + 1000
     );
 
@@ -127,9 +130,9 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     const { sale } = await createSaleWithToken(
       latestBlock + 1,
-      // The late payment attempt is the seventh transaction in this test
+      // The late payment attempt is the eighth transaction in this test
       // so we end the sale seven blocks ahead
-      latestBlock + 6
+      latestBlock + 7
     );
 
     await sale.sendTransaction({
@@ -316,6 +319,31 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     sale
       .sendTransaction({ value: 5, from: purchaser })
+      .should.be.rejectedWith("invalid opcode");
+  });
+
+  it("rejects payments when the sale is paused", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    const sale = await BloomTokenSale.new(
+      latestBlock + 1,
+      latestBlock + 1000,
+      new BigNumber(1000),
+      wallet,
+      new BigNumber("1000")
+    );
+
+    const token = await Bloom.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
+    await advanceBlock();
+
+    sale
+      .sendTransaction({
+        value: 1,
+        from: purchaser
+      })
       .should.be.rejectedWith("invalid opcode");
   });
 
