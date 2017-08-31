@@ -133,4 +133,25 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       .sendTransaction({ value: 1000, from: purchaser })
       .should.be.rejectedWith("invalid opcode");
   });
+
+  it("transfers tokens from controller to sender on purchase", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    const { sale, token } = await createSaleWithToken(
+      latestBlock + 1,
+      latestBlock + 1000
+    );
+    const purchaserTokenAllocationBefore = await token.balanceOf(purchaser);
+    const walletBalanceBefore = web3.eth.getBalance(wallet);
+
+    await sale.sendTransaction({ value: 5, from: purchaser });
+
+    const purchaserTokenAllocationAfter = await token.balanceOf(purchaser);
+    const walletBalanceAfter = web3.eth.getBalance(wallet);
+
+    purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
+
+    purchaserTokenAllocationAfter.should.be.bignumber.equal(5000);
+    walletBalanceAfter.should.be.bignumber.equal(walletBalanceBefore.plus(5));
+  });
 });
