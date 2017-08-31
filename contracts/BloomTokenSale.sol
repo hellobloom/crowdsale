@@ -53,7 +53,7 @@ contract BloomTokenSale is Crowdsale, Ownable, TokenController {
     return _from == address(this);
   }
 
-  function onApprove(address _owner, address _spender, uint _amount) returns(bool) {
-    return true;
+  function onApprove(address, address, uint) returns(bool) {
+    return false;
   }
 }
