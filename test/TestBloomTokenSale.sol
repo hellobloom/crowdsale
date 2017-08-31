@@ -17,12 +17,6 @@ contract TestBloomTokenSale {
     throwProxy = new ThrowProxy(address(this));
   }
 
-  function testOwnerOnlySetToken() {
-    TestBloomTokenSale(throwProxy).throwsWhenNonOwnerSetsToken();
-
-    throwProxy.assertThrows("Should throw when non-owner tries to setToken");
-  }
-
   function throwsWhenNonOwnerSetsToken() {
     BloomTokenSale sale = BloomTokenSale(DeployedAddresses.BloomTokenSale());
 

@@ -59,6 +59,21 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     controllerBalanceAfter.should.be.bignumber.equal("15e25");
   });
 
+  it("only allows the owner to set the token", async function() {
+    const sale = await BloomTokenSale.new(
+      1000,
+      2000,
+      new BigNumber(1000),
+      wallet
+    );
+
+    sale
+      .setToken("0x0", { from: purchaser })
+      .should.be.rejectedWith("invalid opcode");
+
+    sale.setToken("0x0").should.be.fulfilled;
+  });
+
   it("rejects payments that come before the starting block", async function() {
     const latestBlock = web3.eth.getBlock("latest").number;
     const { sale, token } = await createSaleWithToken(
