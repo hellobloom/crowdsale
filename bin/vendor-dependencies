@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+# solidity-coverage fails to work if we reference dependencies from
+# our node_modules. This script automatically copies over specific files
+# after install node_modules
+
+require 'pathname'
+
+root_dir = Pathname.new(__dir__).parent.expand_path
+
+mapping =
+  Pathname
+    .glob('./contracts/**/*.sol')
+    .flat_map do |path|
+      path.read.scan(%r{^import "./vendor/(.+)";$}).flatten
+    end.uniq.map do |dependency|
+      target = root_dir.join('contracts', 'vendor', dependency)
+      source = root_dir.join('node_modules', dependency)
+
+      [source, target]
+    end.to_h
+
+system('yarn > /dev/null')
+
+require 'fileutils'
+mapping.each do |source, target|
+  puts "Copying #{source.relative_path_from(root_dir)} -> #{target.relative_path_from(root_dir)}"
+  target.dirname.mkpath
+  FileUtils.cp(source, target)
+end

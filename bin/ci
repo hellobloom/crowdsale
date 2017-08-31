@@ -1,0 +1,22 @@
+#!/bin/bash
+
+bin/vendor-dependencies
+
+# Returns 0 if there are new vendored contracts in the project
+untracked_contracts() {
+  count=$(git status contracts/vendor --porcelain 2>/dev/null| grep "^??" | wc -l)
+  test "$count" -ne 0
+}
+
+# Returns 0 if there are changed contracts in the project
+changed_contracts() {
+  ! git diff --quiet contracts/vendor
+}
+
+if untracked_contracts || changed_contracts; then
+  echo "Vendored dependencies changed!"
+  git status
+  exit 1
+fi
+
+bin/test
