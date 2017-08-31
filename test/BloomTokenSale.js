@@ -154,4 +154,26 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     purchaserTokenAllocationAfter.should.be.bignumber.equal(5000);
     walletBalanceAfter.should.be.bignumber.equal(walletBalanceBefore.plus(5));
   });
+
+  it("supports buying tokens on behalf of other addresses", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    const { sale, token } = await createSaleWithToken(
+      latestBlock + 1,
+      latestBlock + 1000
+    );
+
+    const purchaserTokenAllocationBefore = await token.balanceOf(purchaser);
+    const investorTokenAllocationBefore = await token.balanceOf(investor);
+
+    await sale.proxyPayment(investor, { value: 5, from: purchaser });
+
+    const purchaserTokenAllocationAfter = await token.balanceOf(purchaser);
+    const investorTokenAllocationAfter = await token.balanceOf(investor);
+
+    purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
+    purchaserTokenAllocationAfter.should.be.bignumber.equal(0);
+    investorTokenAllocationBefore.should.be.bignumber.equal(0);
+    investorTokenAllocationAfter.should.be.bignumber.equal(5000);
+  });
 });

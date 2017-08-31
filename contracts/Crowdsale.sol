@@ -51,30 +51,15 @@ contract Crowdsale {
 
   // fallback function can be used to buy tokens
   function () payable {
-    buyTokens(msg.sender);
+    proxyPayment(msg.sender);
   }
 
-  // low level token purchase function
-  function buyTokens(address beneficiary) payable {
-    require(beneficiary != 0x0);
-    require(validPurchase());
-
-    uint256 weiAmount = msg.value;
-
-    // update state
-    weiRaised = weiRaised.add(weiAmount);
-
-    allocateTokens(beneficiary, weiAmount);
-
-    forwardFunds();
-  }
-
-  function allocateTokens(address _beneficiary, uint256 _weiAmount) private;
+  function proxyPayment(address _owner) payable returns(bool);
 
   // send ether to the fund collection wallet
   // override to create custom fund forwarding mechanisms
-  function forwardFunds() internal {
-    require(wallet.call.value(msg.value)());
+  function forwardFunds() internal returns (bool) {
+    return wallet.call.value(msg.value)();
   }
 
   // @return true if the transaction can buy tokens
