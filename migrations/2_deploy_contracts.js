@@ -12,7 +12,7 @@ module.exports = function deploy(deployer) {
   var now = new Date().valueOf();
   web3.eth.getBlockNumber((error, blockNumber) => {
     deployer
-      .deploy(BloomTokenSale, blockNumber + 10, 10000000, 1000, "0x1")
+      .deploy(BloomTokenSale, blockNumber + 10, 10000000, 1000, "0x1", 10000)
       .then(() => {
         return MiniMeTokenFactory.deployed()
           .then(f => {
