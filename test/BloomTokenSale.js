@@ -61,4 +61,31 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       from: purchaser
     }).should.be.fulfilled;
   });
+
+  it("rejects payments that come after the ending block", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    this.sale = await BloomTokenSale.new(
+      // Each transaction that follows is a new block and the late payment
+      // attempt is the seventh transaction so we start seven blocks ahead
+      latestBlock + 1,
+      latestBlock + 6,
+      new BigNumber(1000),
+      wallet
+    );
+
+    this.token = await Bloom.new();
+    await this.token.changeController(this.sale.address);
+    await this.sale.setToken(this.token.address);
+    await this.sale.allocateSupply();
+
+    await this.sale.sendTransaction({
+      value: 1000,
+      from: purchaser
+    }).should.be.fulfilled;
+
+    await this.sale
+      .sendTransaction({ value: 1000, from: purchaser })
+      .should.be.rejectedWith("invalid opcode");
+  });
 });
