@@ -6,7 +6,7 @@ import "./vendor/zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Crowdsale.sol";
 import "./Bloom.sol";
 
-contract BloomTokenSale is Crowdsale, Ownable, TokenController {
+contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController {
   using SafeMath for uint256;
 
   Bloom public token;
@@ -17,8 +17,10 @@ contract BloomTokenSale is Crowdsale, Ownable, TokenController {
     uint256 _startBlock,
     uint256 _endBlock,
     uint256 _rate,
-    address _wallet
-  ) Crowdsale(_startBlock, _endBlock, _rate, _wallet) {}
+    address _wallet,
+    uint256 _cap
+  ) Crowdsale(_startBlock, _endBlock, _rate, _wallet)
+    CappedCrowdsale(_cap) {}
 
   function setToken(address _token) onlyOwner {
     token = Bloom(_token);

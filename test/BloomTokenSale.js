@@ -11,12 +11,17 @@ const BloomTokenSale = artifacts.require("BloomTokenSale");
 const Bloom = artifacts.require("Bloom");
 
 contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
-  const createSaleWithToken = async function(startBlock, endBlock) {
+  const createSaleWithToken = async function(
+    startBlock,
+    endBlock,
+    cap = new BigNumber("1.66667e23")
+  ) {
     const sale = await BloomTokenSale.new(
       startBlock,
       endBlock,
       new BigNumber(1000),
-      wallet
+      wallet,
+      cap
     );
 
     const token = await Bloom.new();
@@ -37,7 +42,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       10000,
       20000,
       new BigNumber(1000),
-      wallet
+      wallet,
+      new BigNumber("1.66667e23")
     );
 
     const token = await Bloom.new();
@@ -64,7 +70,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       1000,
       2000,
       new BigNumber(1000),
-      wallet
+      wallet,
+      new BigNumber("1.66667e23")
     );
 
     const token = await Bloom.new();
@@ -83,7 +90,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       1000,
       2000,
       new BigNumber(1000),
-      wallet
+      wallet,
+      new BigNumber("1.66667e23")
     );
 
     sale
@@ -233,7 +241,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestBlock + 2,
       latestBlock + 2,
       new BigNumber(1000),
-      wallet
+      wallet,
+      new BigNumber("1.66667e23")
     );
 
     const hasEnded1 = await sale.hasEnded();
@@ -251,7 +260,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestBlock + 2,
       latestBlock + 1,
       new BigNumber(1000),
-      wallet
+      wallet,
+      new BigNumber("1.66667e23")
     ).should.be.rejectedWith("invalid opcode");
   });
 
@@ -262,7 +272,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestBlock - 1,
       latestBlock,
       new BigNumber(1000),
-      wallet
+      wallet,
+      new BigNumber("1.66667e23")
     ).should.be.rejectedWith("invalid opcode");
   });
 
@@ -273,7 +284,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestBlock + 1,
       latestBlock + 1,
       new BigNumber(0),
-      wallet
+      wallet,
+      new BigNumber("1.66667e23")
     ).should.be.rejectedWith("invalid opcode");
   });
 
@@ -284,7 +296,38 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestBlock + 1,
       latestBlock + 1,
       new BigNumber(1000),
-      "0x0"
+      "0x0",
+      new BigNumber("1.66667e23")
+    ).should.be.rejectedWith("invalid opcode");
+  });
+
+  it("accepts payments up until the hard cap", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    const { sale, token } = await createSaleWithToken(
+      latestBlock + 1,
+      latestBlock + 1000,
+      new BigNumber("1000")
+    );
+
+    sale.sendTransaction({ value: 995, from: purchaser }).should.be.fulfilled;
+
+    sale.sendTransaction({ value: 5, from: purchaser }).should.be.fulfilled;
+
+    sale
+      .sendTransaction({ value: 5, from: purchaser })
+      .should.be.rejectedWith("invalid opcode");
+  });
+
+  it("enforces that the cap is greater than zero", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    BloomTokenSale.new(
+      latestBlock + 1,
+      latestBlock + 1,
+      new BigNumber(1000),
+      wallet,
+      0
     ).should.be.rejectedWith("invalid opcode");
   });
 });
