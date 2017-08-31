@@ -177,6 +177,19 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     investorTokenAllocationAfter.should.be.bignumber.equal(5000);
   });
 
+  it("rejects proxy payments for a null address", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    const { sale, token } = await createSaleWithToken(
+      latestBlock + 1,
+      latestBlock + 1000
+    );
+
+    sale
+      .proxyPayment("0x0", { value: 5, from: purchaser })
+      .should.be.rejectedWith("invalid opcode");
+  });
+
   it("does not support transfering tokens unless it is from the controller", async function() {
     const latestBlock = web3.eth.getBlock("latest").number;
 
