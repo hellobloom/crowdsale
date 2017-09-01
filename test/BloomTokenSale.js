@@ -120,7 +120,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     await advanceBlock();
 
-    await sale.sendTransaction({
+    await await sale.sendTransaction({
       value: 1000,
       from: purchaser
     }).should.be.fulfilled;
@@ -136,7 +136,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestBlock + 8
     );
 
-    await sale.sendTransaction({
+    await await sale.sendTransaction({
       value: 1000,
       from: purchaser
     }).should.be.fulfilled;
@@ -156,7 +156,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const purchaserTokenAllocationBefore = await token.balanceOf(purchaser);
     const walletBalanceBefore = web3.eth.getBalance(wallet);
 
-    await sale.sendTransaction({ value: 5, from: purchaser });
+    await await sale.sendTransaction({ value: 5, from: purchaser });
 
     const purchaserTokenAllocationAfter = await token.balanceOf(purchaser);
     const walletBalanceAfter = web3.eth.getBalance(wallet);
@@ -210,7 +210,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestBlock + 1000
     );
 
-    await sale.sendTransaction({ value: 5, from: purchaser });
+    await await sale.sendTransaction({ value: 5, from: purchaser });
 
     token
       .transfer(investor, 5, { from: purchaser })
@@ -227,7 +227,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestBlock + 1000
     );
 
-    await sale.sendTransaction({ value: 5, from: purchaser });
+    await await sale.sendTransaction({ value: 5, from: purchaser });
 
     token
       .approve(investor, 5, { from: purchaser })
@@ -314,11 +314,11 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       new BigNumber("1000")
     );
 
-    sale.sendTransaction({ value: 995, from: purchaser }).should.be.fulfilled;
+    await sale.sendTransaction({ value: 995, from: purchaser }).should.be.fulfilled;
 
-    sale.sendTransaction({ value: 5, from: purchaser }).should.be.fulfilled;
+    await sale.sendTransaction({ value: 5, from: purchaser }).should.be.fulfilled;
 
-    sale
+    await sale
       .sendTransaction({ value: 5, from: purchaser })
       .should.be.rejectedWith("invalid opcode");
   });
@@ -340,7 +340,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale.allocateSupply();
     await advanceBlock();
 
-    sale
+    await sale
       .sendTransaction({
         value: 1,
         from: purchaser
@@ -408,7 +408,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale.unpause();
     await sale.finishConfiguration();
 
-    await sale.sendTransaction({
+    await await sale.sendTransaction({
       value: new BigNumber("8.325e15"), // $3.33 ETH at $400/ETH rate
       from: investor
     });
