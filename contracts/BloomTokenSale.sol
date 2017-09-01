@@ -2,11 +2,12 @@ pragma solidity ^0.4.15;
 
 import "./vendor/minimetoken/contracts/MiniMeToken.sol";
 import "./vendor/zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./vendor/zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "./vendor/zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Crowdsale.sol";
 import "./Bloom.sol";
 
-contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController {
+contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable {
   using SafeMath for uint256;
 
   Bloom public token;
@@ -20,7 +21,9 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController {
     address _wallet,
     uint256 _cap
   ) Crowdsale(_startBlock, _endBlock, _rate, _wallet)
-    CappedCrowdsale(_cap) {}
+    CappedCrowdsale(_cap) {
+      paused = true;
+    }
 
   function setToken(address _token) onlyOwner {
     token = Bloom(_token);
@@ -30,14 +33,8 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController {
     token.generateTokens(address(this), TOTAL_SUPPLY);
   }
 
-  function allocateTokens(address _beneficiary, uint256 _weiAmount) private {
-    token.transferFrom(address(this), _beneficiary, _weiAmount.mul(rate));
-  }
-
-  // Required interface of MiniMeToken
-
   // low level token purchase function
-  function proxyPayment(address beneficiary) payable returns (bool) {
+  function proxyPayment(address beneficiary) payable whenNotPaused returns (bool) {
     require(beneficiary != 0x0);
     require(validPurchase());
 
@@ -49,6 +46,10 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController {
     allocateTokens(beneficiary, weiAmount);
 
     return forwardFunds();
+  }
+
+  function allocateTokens(address _beneficiary, uint256 _weiAmount) private {
+    token.transferFrom(address(this), _beneficiary, _weiAmount.mul(rate));
   }
 
   function onTransfer(address _from, address, uint) returns(bool) {
