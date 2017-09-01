@@ -39,7 +39,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   function setEtherPriceInCents(uint256 _cents) configuration {
     require(_cents > 10000 && _cents < 100000);
-    uint256 weiPerDollar = SafeMath.div(WEI_PER_ETHER_TWO_DECIMALS, _cents);
+    uint256 weiPerDollar = WEI_PER_ETHER_TWO_DECIMALS.div(_cents);
     cap = MAX_RAISE_IN_USD.mul(weiPerDollar);
   }
 
