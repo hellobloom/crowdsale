@@ -15,8 +15,10 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   uint public constant TOTAL_SUPPLY = 15e25; // 150 million BLT with 18 decimals
   uint256 private constant MAX_RAISE_IN_USD = 5e7;
+  uint256 private constant TOKEN_PRICE_IN_CENTS = 333;
 
   uint256 private constant WEI_PER_ETHER_TWO_DECIMALS = 1e20;
+  uint256 private constant TOKEN_UNITS_PER_TOKEN = 1e18;
 
   function BloomTokenSale(
     uint256 _startBlock,
@@ -41,6 +43,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     require(_cents > 10000 && _cents < 100000);
     uint256 weiPerDollar = WEI_PER_ETHER_TWO_DECIMALS.div(_cents);
     cap = MAX_RAISE_IN_USD.mul(weiPerDollar);
+    rate = weiPerDollar.mul(TOKEN_PRICE_IN_CENTS).div(100);
   }
 
   // low level token purchase function
@@ -59,7 +62,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   }
 
   function allocateTokens(address _beneficiary, uint256 _weiAmount) private {
-    token.transferFrom(address(this), _beneficiary, _weiAmount.mul(rate));
+    token.transferFrom(address(this), _beneficiary, _weiAmount.mul(TOKEN_UNITS_PER_TOKEN).div(rate));
   }
 
   function onTransfer(address _from, address, uint) returns(bool) {

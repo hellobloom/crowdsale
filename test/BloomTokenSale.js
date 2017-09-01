@@ -163,7 +163,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
 
-    purchaserTokenAllocationAfter.should.be.bignumber.equal(5000);
+    purchaserTokenAllocationAfter.should.be.bignumber.equal(5000000000000000);
     walletBalanceAfter.should.be.bignumber.equal(walletBalanceBefore.plus(5));
   });
 
@@ -186,7 +186,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
     purchaserTokenAllocationAfter.should.be.bignumber.equal(0);
     investorTokenAllocationBefore.should.be.bignumber.equal(0);
-    investorTokenAllocationAfter.should.be.bignumber.equal(5000);
+    investorTokenAllocationAfter.should.be.bignumber.equal(5000000000000000);
   });
 
   it("rejects proxy payments for a null address", async function() {
@@ -387,5 +387,33 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale
       .setEtherPriceInCents(40000, { from: investor })
       .should.be.rejectedWith("invalid opcode");
+  });
+
+  it("updates the price of one BLT based on the USD/ETH price", async function() {
+    const latestBlock = web3.eth.getBlock("latest").number;
+
+    const sale = await BloomTokenSale.new(
+      latestBlock + 1,
+      2000,
+      new BigNumber(1000),
+      wallet,
+      1
+    );
+
+    const token = await Bloom.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.setEtherPriceInCents(40000);
+    await sale.allocateSupply();
+    await sale.unpause();
+    await sale.finishConfiguration();
+
+    await sale.sendTransaction({
+      value: new BigNumber("8.325e15"), // $3.33 ETH at $400/ETH rate
+      from: investor
+    });
+
+    const investorBalance = await token.balanceOf(investor);
+    investorBalance.should.be.bignumber.equal("1e18");
   });
 });
