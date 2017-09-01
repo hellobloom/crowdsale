@@ -29,6 +29,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale.setToken(token.address);
     await sale.allocateSupply();
     await sale.unpause();
+    await sale.finishConfiguration();
 
     return { sale, token };
   };
@@ -107,9 +108,9 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const latestBlock = web3.eth.getBlock("latest").number;
 
     const { sale, token } = await createSaleWithToken(
-      // The early payment attempt is the seventh transaction in this test
-      // so we start the sale seven blocks ahead
-      latestBlock + 8,
+      // The early payment attempt is the eighth transaction in this test
+      // so we start the sale nine blocks ahead
+      latestBlock + 10,
       latestBlock + 1000
     );
 
@@ -130,9 +131,9 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     const { sale } = await createSaleWithToken(
       latestBlock + 1,
-      // The late payment attempt is the eighth transaction in this test
-      // so we end the sale seven blocks ahead
-      latestBlock + 7
+      // The late payment attempt is the ninth transaction in this test
+      // so we end the sale eight blocks ahead
+      latestBlock + 8
     );
 
     await sale.sendTransaction({
@@ -350,7 +351,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("enforces that the cap is greater than zero", async function() {
     const latestBlock = web3.eth.getBlock("latest").number;
 
-    BloomTokenSale.new(
+    await BloomTokenSale.new(
       latestBlock + 1,
       latestBlock + 1,
       new BigNumber(1000),

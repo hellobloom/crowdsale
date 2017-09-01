@@ -4,10 +4,11 @@ import "./vendor/minimetoken/contracts/MiniMeToken.sol";
 import "./vendor/zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./vendor/zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "./vendor/zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./Configurable.sol";
 import "./Crowdsale.sol";
 import "./Bloom.sol";
 
-contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable {
+contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, Configurable {
   using SafeMath for uint256;
 
   Bloom public token;
@@ -25,11 +26,11 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable {
       paused = true;
     }
 
-  function setToken(address _token) onlyOwner {
+  function setToken(address _token) configuration {
     token = Bloom(_token);
   }
 
-  function allocateSupply() onlyOwner {
+  function allocateSupply() configuration {
     token.generateTokens(address(this), TOTAL_SUPPLY);
   }
 
@@ -58,5 +59,9 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable {
 
   function onApprove(address, address, uint) returns(bool) {
     return false;
+  }
+
+  function validPurchase() internal constant returns (bool) {
+    return super.validPurchase() && configured;
   }
 }
