@@ -14,6 +14,9 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   Bloom public token;
 
   uint public constant TOTAL_SUPPLY = 15e25; // 150 million BLT with 18 decimals
+  uint256 private constant MAX_RAISE_IN_USD = 5e7;
+
+  uint256 private constant WEI_PER_ETHER_TWO_DECIMALS = 1e20;
 
   function BloomTokenSale(
     uint256 _startBlock,
@@ -32,6 +35,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   function allocateSupply() configuration {
     token.generateTokens(address(this), TOTAL_SUPPLY);
+  }
+
+  function setEtherPriceInCents(uint256 _cents) configuration {
+    require(_cents > 10000 && _cents < 100000);
+    uint256 weiPerDollar = SafeMath.div(WEI_PER_ETHER_TWO_DECIMALS, _cents);
+    cap = MAX_RAISE_IN_USD.mul(weiPerDollar);
   }
 
   // low level token purchase function

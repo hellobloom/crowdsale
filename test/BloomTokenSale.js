@@ -359,4 +359,33 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       0
     ).should.be.rejectedWith("invalid opcode");
   });
+
+  it("updates the max raise based on the USD/ETH price", async function() {
+    const sale = await BloomTokenSale.new(
+      1000,
+      2000,
+      new BigNumber(1000),
+      wallet,
+      1
+    );
+
+    await sale.setEtherPriceInCents(40000);
+
+    const weiCap = await sale.cap();
+    weiCap.should.be.bignumber.equal(web3.toWei(125000, "ether"));
+  });
+
+  it("does not let non-owners set the USD/ETH price", async function() {
+    const sale = await BloomTokenSale.new(
+      1000,
+      2000,
+      new BigNumber(1000),
+      wallet,
+      1
+    );
+
+    await sale
+      .setEtherPriceInCents(40000, { from: investor })
+      .should.be.rejectedWith("invalid opcode");
+  });
 });
