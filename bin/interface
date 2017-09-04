@@ -22,9 +22,15 @@ indent() {
   sed 's/^/  /'
 }
 
-echo "Bloom"
-abi_summary build/contracts/Bloom.json | indent
-echo
+summarize() {
+  local name="$1"
+  local path="build/contracts/$name.json"
 
-echo "BloomSale"
-abi_summary build/contracts/BloomTokenSale.json | indent
+  echo "$name"
+  abi_summary "$path" | indent
+  echo
+}
+
+summarize Bloom
+summarize BloomTokenSale
+summarize MiniMeIrrevocableVestedToken

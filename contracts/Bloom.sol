@@ -1,15 +1,15 @@
 pragma solidity ^0.4.15;
 
-import "./vendor/minimetoken/contracts/MiniMeToken.sol";
+import "./MiniMeIrrevocableVestedToken.sol";
 
-contract Bloom is MiniMeToken {
-  function Bloom(address _tokenFactory) MiniMeToken(
+contract Bloom is MiniMeIrrevocableVestedToken {
+  function Bloom(address _tokenFactory) MiniMeIrrevocableVestedToken(
     _tokenFactory,
     0x0,           // no parent token
     0,             // no snapshot block number from parent
     "Bloom Token", // Token name
     18,            // Decimals
     "BLT",         // Symbol
-    false           // Enable transfers
+    true           // Enable transfers
   ) {}
 }
