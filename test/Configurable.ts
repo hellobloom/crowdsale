@@ -1,14 +1,17 @@
 import { advanceBlock } from "./helpers/advanceToBlock";
 const ConfigurableMock = artifacts.require("./helpers/ConfigurableMock");
 
-const BigNumber = web3.BigNumber;
+import * as Web3 from "web3";
+import * as chai from "chai";
+import * as chaiAsPromised from "chai-as-promised";
+import * as chaiBignumber from "chai-bignumber";
 
-const should = require("chai")
-  .use(require("chai-as-promised"))
-  .use(require("chai-bignumber")(BigNumber))
+const should = chai
+  .use(chaiAsPromised)
+  .use(chaiBignumber(web3.BigNumber))
   .should();
 
-contract("Configurable", function([_, investor, wallet, purchaser]) {
+contract("Configurable", function([_, _investor, _wallet, purchaser]) {
   before(async function() {
     //Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
     await advanceBlock();
@@ -44,7 +47,9 @@ contract("Configurable", function([_, investor, wallet, purchaser]) {
     const counter = await ConfigurableMock.new();
     const { logs } = await counter.finishConfiguration();
 
-    const event = logs.find(log => log.event === "Configured");
+    const event = logs.find(
+      (log: Web3.SolidityEvent<never>) => log.event === "Configured"
+    );
 
     should.exist(event);
   });

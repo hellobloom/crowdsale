@@ -50,6 +50,27 @@ testrpc() {
   fi
 }
 
+remove_compiled_tests() {
+  if [ -d ./js_test ]; then
+    rm -r ./js_test
+  fi
+}
+
+compile_tests() {
+  remove_compiled_tests
+
+  # Copy over files so we include things like mock contracts
+  cp -r ./test ./js_test
+
+  # Compile into the js_test directory
+  node_modules/.bin/tsc
+}
+
+compiled_test_files() {
+  # Return a list of compiled test files
+  find js_test -type f
+}
+
 if testrpc_running; then
   echo "Using existing testrpc instance"
 else
@@ -61,5 +82,6 @@ fi
 if [ "$SOLIDITY_COVERAGE" = true ]; then
   node_modules/.bin/solidity-coverage
 else
-  node_modules/.bin/truffle test "$@"
+  compile_tests
+  compiled_test_files | xargs node_modules/.bin/truffle test "$@"
 fi

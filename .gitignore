@@ -2,3 +2,6 @@
 /build
 coverage.json
 coverage/
+
+# Ignore our compiled js_test directory
+/js_test
