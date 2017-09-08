@@ -7,12 +7,17 @@ import * as chaiAsPromised from "chai-as-promised";
 
 const chaiBignumber = require("chai-bignumber");
 
-chai.use(chaiAsPromised).use(chaiBignumber(web3.BigNumber)).should();
+chai
+  .use(chaiAsPromised)
+  .use(chaiBignumber(web3.BigNumber))
+  .should();
 
 const BloomTokenSale = artifacts.require("BloomTokenSale");
 const Bloom = artifacts.require("Bloom");
 
-contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
+contract("BloomTokenSale", function(
+  [_, investor, wallet, purchaser]
+) {
   const createSaleWithToken = async function(
     startBlock: number,
     endBlock: number,
@@ -229,7 +234,10 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestBlock + 1000
     );
 
-    await await sale.sendTransaction({ value: 5, from: purchaser });
+    await sale.sendTransaction({
+      value: 5,
+      from: purchaser
+    });
 
     token
       .approve(investor, 5, { from: purchaser })
