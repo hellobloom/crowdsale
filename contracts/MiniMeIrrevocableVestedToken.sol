@@ -1,4 +1,4 @@
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.15;
 
 // Slightly modified Zeppelin's Vested Token deriving MiniMeToken
 
@@ -24,6 +24,9 @@ import "./vendor/zeppelin-solidity/contracts/math/Math.sol";
 // More complex cloning could account for past vesting calendars.
 
 contract MiniMeIrrevocableVestedToken is MiniMeToken {
+  using SafeMath for uint256;
+  using Math for uint64;
+
   // Keep the struct at 2 sstores (1 slot for value + 64 * 3 (dates) + 20 (address) = 2 slots (2nd slot is 212 bytes, lower than 256))
   struct TokenGrant {
     address granter;
@@ -33,29 +36,20 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     uint64 start;
   }
 
-  event NewTokenGrant(
-    address indexed from,
-    address indexed to,
-    uint256 value,
-    uint64 start,
-    uint64 cliff,
-    uint64 vesting
-  );
-
-  event Debug();
+  event NewTokenGrant(address indexed from, address indexed to, uint256 value, uint64 start, uint64 cliff, uint64 vesting);
 
   mapping (address => TokenGrant[]) public grants;
 
-  mapping (address => bool) public canCreateGrants;
+  mapping (address => bool) canCreateGrants;
   address vestingWhitelister;
 
   modifier canTransfer(address _sender, uint _value) {
-    if (_value > spendableBalanceOf(_sender)) throw;
+    require(spendableBalanceOf(_sender) >= _value);
     _;
   }
 
   modifier onlyVestingWhitelister {
-    if (msg.sender != vestingWhitelister) throw;
+    require(msg.sender == vestingWhitelister);
     _;
   }
 
@@ -99,17 +93,17 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     uint64 _vesting) public {
 
     // Check start, cliff and vesting are properly order to ensure correct functionality of the formula.
-    if (_cliff < _start) throw;
-    if (_vesting < _start) throw;
-    if (_vesting < _cliff) throw;
+    require(_cliff >= _start);
+    require(_vesting >= _start);
+    require(_vesting >= _cliff);
 
-    if (!canCreateGrants[msg.sender]) throw;
-    if (tokenGrantsCount(_to) > 20) throw;   // To prevent a user being spammed and have his balance locked (out of gas attack when calculating vesting).
+    require(canCreateGrants[msg.sender]);
+    require(tokenGrantsCount(_to) < 20);   // To prevent a user being spammed and have his balance locked (out of gas attack when calculating vesting).
 
     TokenGrant memory grant = TokenGrant(msg.sender, _value, _cliff, _vesting, _start);
     grants[_to].push(grant);
 
-    if (!transfer(_to, _value)) throw;
+    assert(transfer(_to, _value));
 
     NewTokenGrant(msg.sender, _to, _value, _cliff, _vesting, _start);
   }
@@ -131,8 +125,8 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
   }
 
   // @dev Not allow token grants
-  function revokeTokenGrant(address _holder, uint _grantId) public {
-    throw;
+  function revokeTokenGrant(address, uint) public {
+    revert();
   }
 
   //
@@ -141,7 +135,7 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
   }
 
   function tokenGrant(address _holder, uint _grantId) constant public returns (address granter, uint256 value, uint256 vested, uint64 start, uint64 cliff, uint64 vesting) {
-    TokenGrant grant = grants[_holder][_grantId];
+    TokenGrant storage grant = grants[_holder][_grantId];
 
     granter = grant.granter;
     value = grant.value;
@@ -152,7 +146,7 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     vested = vestedTokens(grant, uint64(now));
   }
 
-  function vestedTokens(TokenGrant grant, uint64 time) internal constant returns (uint256) {
+  function vestedTokens(TokenGrant storage grant, uint64 time) internal constant returns (uint256) {
     return calculateVestedTokens(
       grant.value,
       uint256(time),
@@ -163,11 +157,11 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
   }
 
   //  transferableTokens
-  //   |                         _/--------   NonVestedTokens
-  //   |                       _/
-  //   |                     _/
-  //   |                   _/
-  //   |                 _/
+  //   |                     /--------   vestedTokens
+  //   |                    /
+  //   |                   /
+  //   |                  /
+  //   |                 /
   //   |                /
   //   |              .|
   //   |            .  |
@@ -179,7 +173,7 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
   //      Start       Clift    Vesting
 
   function calculateVestedTokens(
-  uint256 tokens,
+    uint256 tokens,
     uint256 time,
     uint256 start,
     uint256 cliff,
@@ -195,21 +189,17 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     // calculate it.
 
     // vested = tokens * (time - start) / (vesting - start)
-    uint256 vested = SafeMath.div(
-                       SafeMath.mul(
-                         tokens,
-                         SafeMath.sub(time, start)
-                       ),
-                       SafeMath.sub(vesting, start)
-                     );
+    uint256 vested = tokens.mul(
+                             time.sub(start)
+                           ).div(vesting.sub(start));
 
     return vested;
   }
 
-  function nonVestedTokens(TokenGrant grant, uint64 time) internal constant returns (uint256) {
+  function nonVestedTokens(TokenGrant storage grant, uint64 time) internal constant returns (uint256) {
     // Of all the tokens of the grant, how many of them are not vested?
     // grantValue - vestedTokens
-    return SafeMath.sub(grant.value, vestedTokens(grant, time));
+    return grant.value.sub(vestedTokens(grant, time));
   }
 
   // @dev The date in which all tokens are transferable for the holder
@@ -218,7 +208,7 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     date = uint64(now);
     uint256 grantIndex = tokenGrantsCount(holder);
     for (uint256 i = 0; i < grantIndex; i++) {
-      date = Math.max64(grants[holder][i].vesting, date);
+      date = grants[holder][i].vesting.max64(date);
     }
     return date;
   }
@@ -232,10 +222,10 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     // Iterate through all the grants the holder has, and add all non-vested tokens
     uint256 nonVested = 0;
     for (uint256 i = 0; i < grantIndex; i++) {
-      nonVested = SafeMath.add(nonVested, nonVestedTokens(grants[holder][i], time));
+      nonVested = nonVested.add(nonVestedTokens(grants[holder][i], time));
     }
 
     // Balance - totalNonVested is the amount of tokens a holder can transfer at any given time
-    return SafeMath.sub(balanceOf(holder), nonVested);
+    return balanceOf(holder).sub(nonVested);
   }
 }
