@@ -54,6 +54,9 @@ contract Crowdsale {
     proxyPayment(msg.sender);
   }
 
+  // Make a payment for the provided address
+  //
+  // @param _owner address that will own the purchased tokens
   function proxyPayment(address _owner) payable returns(bool);
 
   // send ether to the fund collection wallet
