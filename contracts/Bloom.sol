@@ -2,6 +2,10 @@ pragma solidity ^0.4.15;
 
 import "./MiniMeIrrevocableVestedToken.sol";
 
+/**
+ * @title Bloom
+ * @dev Bloom's network token.
+ */
 contract Bloom is MiniMeIrrevocableVestedToken {
   function Bloom(address _tokenFactory) MiniMeIrrevocableVestedToken(
     _tokenFactory,
