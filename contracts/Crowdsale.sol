@@ -1,6 +1,6 @@
 pragma solidity ^0.4.15;
 
-import "./vendor/zeppelin-solidity/contracts/math/SafeMath.sol";
+import "zeppelin/math/SafeMath.sol";
 
 /**
  * @title Crowdsale

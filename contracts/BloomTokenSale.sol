@@ -1,9 +1,9 @@
 pragma solidity ^0.4.15;
 
-import "./vendor/minimetoken/contracts/MiniMeToken.sol";
-import "./vendor/zeppelin-solidity/contracts/ownership/Ownable.sol";
-import "./vendor/zeppelin-solidity/contracts/lifecycle/Pausable.sol";
-import "./vendor/zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./MiniMeToken.sol";
+import "zeppelin/ownership/Ownable.sol";
+import "zeppelin/lifecycle/Pausable.sol";
+import "zeppelin/math/SafeMath.sol";
 import "./Configurable.sol";
 import "./Crowdsale.sol";
 import "./Bloom.sol";

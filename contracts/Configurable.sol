@@ -1,6 +1,6 @@
 pragma solidity ^0.4.15;
 
-import "./vendor/zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "zeppelin/ownership/Ownable.sol";
 
 /**
  * @title Configurable

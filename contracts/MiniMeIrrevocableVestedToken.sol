@@ -2,9 +2,9 @@ pragma solidity ^0.4.15;
 
 // Slightly modified Zeppelin's Vested Token deriving MiniMeToken
 
-import "./vendor/minimetoken/contracts/MiniMeToken.sol";
-import "./vendor/zeppelin-solidity/contracts/math/SafeMath.sol";
-import "./vendor/zeppelin-solidity/contracts/math/Math.sol";
+import "./MiniMeToken.sol";
+import "zeppelin/math/SafeMath.sol";
+import "zeppelin/math/Math.sol";
 
 /*
     Copyright 2017, Jorge Izquierdo (Aragon Foundation)
