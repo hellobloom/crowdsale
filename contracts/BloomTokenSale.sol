@@ -27,6 +27,8 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   uint256 private constant WEI_PER_ETHER_TWO_DECIMALS = 1e20;
   uint256 private constant TOKEN_UNITS_PER_TOKEN = 1e18; // Decimal units per BLT
 
+  event NewPresaleAllocation(address indexed holder, uint256 bltAmount);
+
   function BloomTokenSale(
     uint256 _startBlock,
     uint256 _endBlock,
@@ -74,6 +76,18 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
     // Send the transfered wei to our wallet
     return forwardFunds();
+  }
+
+  function allocatePresaleTokens(address _receiver, uint256 _amount, uint64 cliffDate, uint64 vestingDate)
+           onlyOwner
+           whenNotPaused
+           public {
+
+    require(_amount <= 10 ** 24); // 1 million BLT. No presale partner will have more than this allocated. Prevent overflows.
+
+    token.grantVestedTokens(_receiver, _amount, uint64(now), cliffDate, vestingDate);
+
+    NewPresaleAllocation(_receiver, _amount);
   }
 
   // @dev Transfer funds from the controller's address to the _beneficiary. Uses

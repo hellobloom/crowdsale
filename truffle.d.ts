@@ -83,6 +83,13 @@ interface BloomTokenSaleInstance extends ContractInstance, Ownable {
   sendTransaction(...args: any[]): any;
   setEtherPriceInCents(...args: any[]): any;
   setToken(token: Address, options?: TransactionOptions): Promise<void>;
+  allocatePresaleTokens(
+    receiver: Address,
+    amount: number,
+    cliffDate: number,
+    vestingDate: number,
+    options?: TransactionOptions
+  ): Promise<any>;
   symbol(...args: any[]): any;
   tokenFactory(...args: any[]): any;
   totalSupply(...args: any[]): any;
@@ -137,7 +144,7 @@ interface MiniMeIrrevocableVestedTokenInstance extends ContractInstance {
   totalSupply(): Promise<BigNumber.BigNumber>;
   setCanCreateGrants(addr: string, allowed: boolean): never;
   transferFrom(from: string, to: string, value: number): never;
-  grants(string: number): never;
+  grants(address: string, id: number): Promise<object>;
   decimals(): never;
   changeController(
     newController: Address,

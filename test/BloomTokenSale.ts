@@ -1,5 +1,8 @@
 import { advanceBlock, advanceToBlock } from "./helpers/advanceToBlock";
-import { latestBlockNumber } from "./helpers/latestBlockNumber";
+import {
+  latestBlockNumber,
+  latestBlockTime
+} from "./helpers/latestBlockNumber";
 
 import * as BigNumber from "bignumber.js";
 import * as chai from "chai";
@@ -15,9 +18,7 @@ chai
 const BloomTokenSale = artifacts.require("BloomTokenSale");
 const Bloom = artifacts.require("Bloom");
 
-contract("BloomTokenSale", function(
-  [_, investor, wallet, purchaser]
-) {
+contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   const createSaleWithToken = async function(
     startBlock: number,
     endBlock: number,
@@ -431,5 +432,29 @@ contract("BloomTokenSale", function(
 
     const investorBalance = await token.balanceOf(investor);
     investorBalance.should.be.bignumber.equal("1e18");
+  });
+
+  it("allocates vested tokens for presale purchases", async () => {
+    const latestBlock = latestBlockNumber();
+
+    const { sale, token } = await createSaleWithToken(
+      latestBlock + 50,
+      latestBlock + 100
+    );
+
+    await token.setCanCreateGrants(sale.address, true);
+
+    await sale.allocatePresaleTokens(
+      investor,
+      5000,
+      latestBlockTime() + 10000,
+      latestBlockTime() + 100000
+    ).should.be.fulfilled;
+
+    const investorBalance = await token.balanceOf(investor);
+    const spendableBalance = await token.spendableBalanceOf(investor);
+
+    investorBalance.should.be.bignumber.equal(5000);
+    spendableBalance.should.be.bignumber.equal(0);
   });
 });
