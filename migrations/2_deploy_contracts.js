@@ -6,13 +6,16 @@ var Bloom = artifacts.require("./Bloom.sol");
 var BloomTokenSale = artifacts.require("./BloomTokenSale.sol");
 
 module.exports = function deploy(deployer) {
+  if (process.env.CI === "true") {
+    return;
+  }
+  const wallet = "0x9d217bcbd0bfae4d7f8f12c7702108d162e3ab79";
   deployer.deploy(MiniMeTokenFactory);
-  deployer.deploy(Bloom);
 
   var now = new Date().valueOf();
   web3.eth.getBlockNumber((error, blockNumber) => {
     deployer
-      .deploy(BloomTokenSale, blockNumber + 10, 10000000, 1000, "0x1", 10000)
+      .deploy(BloomTokenSale, blockNumber + 10, 10000000, 1000, wallet, 10000)
       .then(() => {
         return MiniMeTokenFactory.deployed()
           .then(f => {
@@ -21,17 +24,26 @@ module.exports = function deploy(deployer) {
           })
           .then(s => {
             sale = s;
-            return Bloom.new(factory.address);
+            return deployer.deploy(Bloom, factory.address);
+          })
+          .then(() => {
+            return Bloom.deployed();
           })
           .then(b => {
             bloom = b;
-            return Bloom.deployed();
-          })
-          .then(() => {
             return bloom.changeController(sale.address);
           })
           .then(() => {
             return sale.setToken(bloom.address);
+          })
+          .then(() => {
+            return bloom.setCanCreateGrants(sale.address, true);
+          })
+          .then(() => {
+            return sale.allocateSupply();
+          })
+          .then(() => {
+            return sale.unpause();
           })
           .catch(console.log);
       })
