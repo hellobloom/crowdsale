@@ -468,6 +468,77 @@ export interface MiniMeTokenFactoryInstance extends ContractInstance {
   ): Promise<Address>
 }
 
+export interface MultiSigWalletInstance extends ContractInstance {
+  owners(unnamed13: UInt, options?: TransactionOptions): Promise<Address>,
+  removeOwner(owner: Address, options?: TransactionOptions): Promise<void>,
+  revokeConfirmation(
+    transactionId: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
+  isOwner(unnamed14: Address, options?: TransactionOptions): Promise<boolean>,
+  confirmations(
+    unnamed15: UInt,
+    unnamed16: Address,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  getTransactionCount(
+    pending: boolean,
+    executed: boolean,
+    options?: TransactionOptions
+  ): Promise<UInt>,
+  addOwner(owner: Address, options?: TransactionOptions): Promise<void>,
+  isConfirmed(
+    transactionId: UInt,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  getConfirmationCount(
+    transactionId: UInt,
+    options?: TransactionOptions
+  ): Promise<UInt>,
+  transactions(
+    unnamed17: UInt,
+    options?: TransactionOptions
+  ): Promise<[Address, UInt, string, boolean]>,
+  getOwners(options?: TransactionOptions): Promise<Address[]>,
+  getTransactionIds(
+    from: UInt,
+    to: UInt,
+    pending: boolean,
+    executed: boolean,
+    options?: TransactionOptions
+  ): Promise<UInt[]>,
+  getConfirmations(
+    transactionId: UInt,
+    options?: TransactionOptions
+  ): Promise<Address[]>,
+  transactionCount(options?: TransactionOptions): Promise<UInt>,
+  changeRequirement(
+    required: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
+  confirmTransaction(
+    transactionId: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
+  submitTransaction(
+    destination: Address,
+    value: UInt,
+    data: string,
+    options?: TransactionOptions
+  ): Promise<UInt>,
+  MAX_OWNER_COUNT(options?: TransactionOptions): Promise<UInt>,
+  required(options?: TransactionOptions): Promise<UInt>,
+  replaceOwner(
+    owner: Address,
+    newOwner: Address,
+    options?: TransactionOptions
+  ): Promise<void>,
+  executeTransaction(
+    transactionId: UInt,
+    options?: TransactionOptions
+  ): Promise<void>
+}
+
 export interface OwnableInstance extends ContractInstance {
   owner(options?: TransactionOptions): Promise<Address>,
   transferOwnership(

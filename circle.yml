@@ -3,5 +3,10 @@ machine:
     version: 6.11.2
 
 dependencies:
-  post:
+  override:
+    - yarn
     - ./node_modules/.bin/truffle install
+
+test:
+  override:
+    - bin/test

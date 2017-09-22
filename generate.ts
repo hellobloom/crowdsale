@@ -30,12 +30,14 @@ interface UnknownMember {
 
 type SolidityType =
   | "address"
+  | "address[]"
   | "bool"
   | "bytes"
   | "string"
   | "uint8"
   | "uint64"
-  | "uint256";
+  | "uint256"
+  | "uint256[]";
 
 interface FunctionMemberInput {
   name: string;
@@ -165,6 +167,8 @@ function translateType(type: SolidityType): string {
       return "string";
     case "address":
       return "Address";
+    case "address[]":
+      return "Address[]";
     case "bool":
       return "boolean";
     case "bytes":
@@ -173,6 +177,8 @@ function translateType(type: SolidityType): string {
     case "uint64":
     case "uint256":
       return "UInt";
+    case "uint256[]":
+      return "UInt[]";
     default:
       throw `Unexpected case! ${type}`;
   }
