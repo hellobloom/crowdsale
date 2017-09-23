@@ -5,7 +5,7 @@ import "zeppelin/ownership/Ownable.sol";
 import "zeppelin/lifecycle/Pausable.sol";
 import "zeppelin/math/SafeMath.sol";
 import "./Configurable.sol";
-import "./Crowdsale.sol";
+import "./CappedCrowdsale.sol";
 import "./Bloom.sol";
 
 /**
