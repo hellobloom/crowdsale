@@ -3965,7 +3965,7 @@ trim@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/trim/-/trim-0.0.1.tgz#5858547f6b290757ee95cccc666fb50084c460dd"
 
-truffle-hdwallet-provider@0.0.3, truffle-hdwallet-provider@^0.0.3:
+truffle-hdwallet-provider@^0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/truffle-hdwallet-provider/-/truffle-hdwallet-provider-0.0.3.tgz#0e1de02104b73d3875e1cf7093305b4ea8a2d843"
   dependencies:
@@ -4395,9 +4395,3 @@ yargs@~3.29.0:
 yn@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/yn/-/yn-2.0.0.tgz#e5adabc8acf408f6385fc76495684c88e6af689a"
-
-zeppelin-solidity@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/zeppelin-solidity/-/zeppelin-solidity-1.2.0.tgz#3a50c991a4da2f14fd79e66a2eb576407a6fb124"
-  dependencies:
-    truffle-hdwallet-provider "0.0.3"

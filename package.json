@@ -9,8 +9,7 @@
   },
   "dependencies": {
     "minimetoken": "^0.1.7",
-    "truffle": "^3.4.9",
-    "zeppelin-solidity": "^1.2.0"
+    "truffle": "^3.4.9"
   },
   "devDependencies": {
     "@types/bignumber.js": "^4.0.3",
