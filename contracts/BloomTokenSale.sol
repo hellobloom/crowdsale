@@ -30,12 +30,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   event NewPresaleAllocation(address indexed holder, uint256 bltAmount);
 
   function BloomTokenSale(
-    uint256 _startBlock,
-    uint256 _endBlock,
+    uint256 _startTime,
+    uint256 _endTime,
     uint256 _rate,
     address _wallet,
     uint256 _cap
-  ) Crowdsale(_startBlock, _endBlock, _rate, _wallet)
+  ) Crowdsale(_startTime, _endTime, _rate, _wallet)
     CappedCrowdsale(_cap) {
       paused = true;
     }
@@ -75,7 +75,9 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     allocateTokens(_beneficiary, weiAmount);
 
     // Send the transfered wei to our wallet
-    return forwardFunds();
+    forwardFunds();
+
+    return true;
   }
 
   function allocatePresaleTokens(address _receiver, uint256 _amount, uint64 cliffDate, uint64 vestingDate)

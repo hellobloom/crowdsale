@@ -5,7 +5,7 @@ import "zeppelin/math/SafeMath.sol";
 /**
  * @title Crowdsale
  * @dev Crowdsale is a base contract for managing a token crowdsale.
- * Crowdsales have a start and end block, where investors can make
+ * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
  * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
@@ -15,9 +15,9 @@ import "zeppelin/math/SafeMath.sol";
 contract Crowdsale {
   using SafeMath for uint256;
 
-  // start and end block where investments are allowed (both inclusive)
-  uint256 public startBlock;
-  uint256 public endBlock;
+  // start and end timestamps where investments are allowed (both inclusive)
+  uint256 public startTime;
+  uint256 public endTime;
 
   // address where funds are collected
   address public wallet;
@@ -37,14 +37,14 @@ contract Crowdsale {
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  function Crowdsale(uint256 _startBlock, uint256 _endBlock, uint256 _rate, address _wallet) {
-    require(_startBlock >= block.number);
-    require(_endBlock >= _startBlock);
+  function Crowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) {
+    require(_startTime >= now);
+    require(_endTime >= _startTime);
     require(_rate > 0);
     require(_wallet != 0x0);
 
-    startBlock = _startBlock;
-    endBlock = _endBlock;
+    startTime = _startTime;
+    endTime = _endTime;
     rate = _rate;
     wallet = _wallet;
   }
@@ -61,21 +61,19 @@ contract Crowdsale {
 
   // send ether to the fund collection wallet
   // override to create custom fund forwarding mechanisms
-  function forwardFunds() internal returns (bool) {
+  function forwardFunds() internal {
     wallet.transfer(msg.value);
-    return true;
   }
 
   // @return true if the transaction can buy tokens
   function validPurchase() internal constant returns (bool) {
-    uint256 current = block.number;
-    bool withinPeriod = current >= startBlock && current <= endBlock;
+    bool withinPeriod = now >= startTime && now <= endTime;
     bool nonZeroPurchase = msg.value != 0;
     return withinPeriod && nonZeroPurchase;
   }
 
   // @return true if crowdsale event has ended
   function hasEnded() public constant returns (bool) {
-    return block.number > endBlock;
+    return now > endTime;
   }
 }

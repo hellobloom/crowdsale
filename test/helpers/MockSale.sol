@@ -4,8 +4,8 @@ import '../../contracts/BloomTokenSale.sol';
 
 contract MockSale is BloomTokenSale {
   function MockSale() BloomTokenSale(
-    block.number,
-    block.number + 1000,
+    block.timestamp,
+    block.timestamp + 10,
     1000,
     address(this),
     10000000
