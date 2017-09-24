@@ -18,7 +18,9 @@ contract MockSale is BloomTokenSale {
       _amount,
       uint64(now),
       uint64(now),
-      uint64(now)
+      uint64(now),
+      false,
+      false
     );
   }
 

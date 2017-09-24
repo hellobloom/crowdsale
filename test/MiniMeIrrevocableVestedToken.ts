@@ -68,22 +68,46 @@ contract("MiniMeIrrevocableVestedToken", function(
 
   it("cannot create token grants after losing whitelisting ability", async () => {
     // Demonstrate we can grant vested tokens before the change
-    await token.grantVestedTokens(receiver, 50, now, now + 10000, now + 20000)
-      .should.be.fulfilled;
+    await token.grantVestedTokens(
+      receiver,
+      50,
+      now,
+      now + 10000,
+      now + 20000,
+      false,
+      false
+    ).should.be.fulfilled;
 
     await token.changeVestingWhitelister(secondGranter).should.be.fulfilled;
 
     await token
-      .grantVestedTokens(receiver, 50, now, now + 10000, now + 20000)
+      .grantVestedTokens(
+        receiver,
+        50,
+        now,
+        now + 10000,
+        now + 20000,
+        false,
+        false
+      )
       .should.be.rejectedWith("invalid opcode");
   });
 
   it("can create token grants after being whitelisted", async () => {
     await token.changeVestingWhitelister(secondGranter);
     await token.setCanCreateGrants(granter, true, { from: secondGranter });
-    await token.grantVestedTokens(receiver, 50, now, now + 10000, now + 20000, {
-      from: granter
-    });
+    await token.grantVestedTokens(
+      receiver,
+      50,
+      now,
+      now + 10000,
+      now + 20000,
+      false,
+      false,
+      {
+        from: granter
+      }
+    );
     (await token.balanceOf(receiver)).should.be.bignumber.equal(50);
   });
 
@@ -105,6 +129,8 @@ contract("MiniMeIrrevocableVestedToken", function(
         now,
         now + cliff,
         now + vesting,
+        false,
+        false,
         { from: granter }
       );
     });
@@ -170,6 +196,8 @@ contract("MiniMeIrrevocableVestedToken", function(
         newNow,
         newNow + cliff,
         newNow + vesting,
+        false,
+        false,
         { from: granter }
       );
       await token.transfer(user, 13, { from: receiver });
@@ -182,6 +210,38 @@ contract("MiniMeIrrevocableVestedToken", function(
         from: receiver
       });
       assert.equal(await token.balanceOf(user), 50 * 2);
+    });
+  });
+
+  describe("revoking a token grant", async () => {
+    const cliff = 10000;
+    const vesting = 20000; // seconds
+
+    beforeEach(async () => {
+      await token.grantVestedTokens(
+        receiver,
+        50,
+        now,
+        now + cliff,
+        now + vesting,
+        true,
+        false,
+        { from: granter }
+      );
+    });
+
+    it("revokes remaining tokens", async () => {
+      const granterBalanceBefore = await token.spendableBalanceOf(granter);
+
+      await timer(15000);
+
+      await token.revokeTokenGrant(receiver, 0);
+
+      const granterBalance = await token.spendableBalanceOf(granter);
+      const receiverBalance = await token.spendableBalanceOf(receiver);
+
+      (granterBalance - granterBalanceBefore).should.be.bignumber.equal(13);
+      receiverBalance.should.be.bignumber.equal(37);
     });
   });
 });

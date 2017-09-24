@@ -159,13 +159,12 @@ export interface BloomInstance extends ContractInstance {
 }
 
 export interface BloomTokenSaleInstance extends ContractInstance {
-  endBlock(options?: TransactionOptions): Promise<UInt>,
   setToken(token: Address, options?: TransactionOptions): Promise<void>,
   rate(options?: TransactionOptions): Promise<UInt>,
+  endTime(options?: TransactionOptions): Promise<UInt>,
   cap(options?: TransactionOptions): Promise<UInt>,
-  unpause(options?: TransactionOptions): Promise<boolean>,
+  unpause(options?: TransactionOptions): Promise<void>,
   weiRaised(options?: TransactionOptions): Promise<UInt>,
-  startBlock(options?: TransactionOptions): Promise<UInt>,
   onTransfer(
     from: Address,
     unnamed4: Address,
@@ -175,11 +174,12 @@ export interface BloomTokenSaleInstance extends ContractInstance {
   wallet(options?: TransactionOptions): Promise<Address>,
   paused(options?: TransactionOptions): Promise<boolean>,
   finishConfiguration(options?: TransactionOptions): Promise<boolean>,
+  startTime(options?: TransactionOptions): Promise<UInt>,
   setEtherPriceInCents(
     cents: UInt,
     options?: TransactionOptions
   ): Promise<void>,
-  pause(options?: TransactionOptions): Promise<boolean>,
+  pause(options?: TransactionOptions): Promise<void>,
   configured(options?: TransactionOptions): Promise<boolean>,
   owner(options?: TransactionOptions): Promise<Address>,
   TOTAL_SUPPLY(options?: TransactionOptions): Promise<UInt>,
@@ -210,12 +210,12 @@ export interface BloomTokenSaleInstance extends ContractInstance {
 }
 
 export interface CappedCrowdsaleInstance extends ContractInstance {
-  endBlock(options?: TransactionOptions): Promise<UInt>,
   rate(options?: TransactionOptions): Promise<UInt>,
+  endTime(options?: TransactionOptions): Promise<UInt>,
   cap(options?: TransactionOptions): Promise<UInt>,
   weiRaised(options?: TransactionOptions): Promise<UInt>,
-  startBlock(options?: TransactionOptions): Promise<UInt>,
   wallet(options?: TransactionOptions): Promise<Address>,
+  startTime(options?: TransactionOptions): Promise<UInt>,
   hasEnded(options?: TransactionOptions): Promise<boolean>,
   proxyPayment(owner: Address, options?: TransactionOptions): Promise<boolean>
 }
@@ -239,11 +239,11 @@ export interface ControlledInstance extends ContractInstance {
 }
 
 export interface CrowdsaleInstance extends ContractInstance {
-  endBlock(options?: TransactionOptions): Promise<UInt>,
   rate(options?: TransactionOptions): Promise<UInt>,
+  endTime(options?: TransactionOptions): Promise<UInt>,
   weiRaised(options?: TransactionOptions): Promise<UInt>,
-  startBlock(options?: TransactionOptions): Promise<UInt>,
   wallet(options?: TransactionOptions): Promise<Address>,
+  startTime(options?: TransactionOptions): Promise<UInt>,
   hasEnded(options?: TransactionOptions): Promise<boolean>,
   proxyPayment(owner: Address, options?: TransactionOptions): Promise<boolean>
 }
@@ -548,9 +548,9 @@ export interface OwnableInstance extends ContractInstance {
 }
 
 export interface PausableInstance extends ContractInstance {
-  unpause(options?: TransactionOptions): Promise<boolean>,
+  unpause(options?: TransactionOptions): Promise<void>,
   paused(options?: TransactionOptions): Promise<boolean>,
-  pause(options?: TransactionOptions): Promise<boolean>,
+  pause(options?: TransactionOptions): Promise<void>,
   owner(options?: TransactionOptions): Promise<Address>,
   transferOwnership(
     newOwner: Address,
