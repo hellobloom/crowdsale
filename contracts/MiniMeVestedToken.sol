@@ -167,7 +167,14 @@ contract MiniMeVestedToken is MiniMeToken {
     return grants[_holder].length;
   }
 
-  function tokenGrant(address _holder, uint _grantId) constant public returns (address granter, uint256 value, uint256 vested, uint64 start, uint64 cliff, uint64 vesting) {
+  /**
+   * @dev Get all information about a specific grant.
+   * @param _holder The address which will have its tokens revoked.
+   * @param _grantId The id of the token grant.
+   * @return Returns all the values that represent a TokenGrant(address, value, start, cliff,
+   * revokability, burnsOnRevoke, and vesting) plus the vested value at the current time.
+   */
+  function tokenGrant(address _holder, uint256 _grantId) public constant returns (address granter, uint256 value, uint256 vested, uint64 start, uint64 cliff, uint64 vesting, bool revokable, bool burnsOnRevoke) {
     TokenGrant storage grant = grants[_holder][_grantId];
 
     granter = grant.granter;
@@ -175,11 +182,19 @@ contract MiniMeVestedToken is MiniMeToken {
     start = grant.start;
     cliff = grant.cliff;
     vesting = grant.vesting;
+    revokable = grant.revokable;
+    burnsOnRevoke = grant.burnsOnRevoke;
 
     vested = vestedTokens(grant, uint64(now));
   }
 
-  function vestedTokens(TokenGrant storage grant, uint64 time) internal constant returns (uint256) {
+  /**
+   * @dev Get the amount of vested tokens at a specific time.
+   * @param grant TokenGrant The grant to be checked.
+   * @param time The time to be checked
+   * @return An uint256 representing the amount of vested tokens of a specific grant at a specific time.
+   */
+  function vestedTokens(TokenGrant grant, uint64 time) private constant returns (uint256) {
     return calculateVestedTokens(
       grant.value,
       uint256(time),
