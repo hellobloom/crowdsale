@@ -13,9 +13,16 @@ module.exports = function deploy(deployer) {
   deployer.deploy(MiniMeTokenFactory);
 
   var now = new Date().valueOf();
-  web3.eth.getBlockNumber((error, blockNumber) => {
+  web3.eth.getBlock("latest", (error, block) => {
     deployer
-      .deploy(BloomTokenSale, blockNumber + 10, 10000000, 1000, wallet, 10000)
+      .deploy(
+        BloomTokenSale,
+        block.timestamp + 1,
+        block.timestamp + 60 * 60 * 24,
+        1000,
+        wallet,
+        10000
+      )
       .then(() => {
         return MiniMeTokenFactory.deployed()
           .then(f => {
