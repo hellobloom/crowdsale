@@ -454,7 +454,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await timer(5);
 
     await await sale.sendTransaction({
-      value: new BigNumber("8.325e15"), // $3.33 ETH at $400/ETH rate
+      value: new BigNumber("1525000000000000"), // $0.61 worth of ETH at $400/ETH rate
       from: investor
     });
 
