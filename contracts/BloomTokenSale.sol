@@ -19,9 +19,14 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   Bloom public token;
 
-  uint public constant TOTAL_SUPPLY = 15e25; // 150 million BLT with 18 decimals
+  uint256 public constant TOTAL_SUPPLY = 15e25; // 150 million BLT with 18 decimals
+  uint256 private constant FOUNDER_SUPPLY = 3e25; // 20% supply
+  uint256 private constant FOUNDATION_SUPPLY = 3e25; // 20% supply
+  uint256 private constant ADVISOR_SUPPLY = 755e23; // 5% supply
+  uint256 private constant SALE_SUPPLY =
+    TOTAL_SUPPLY - FOUNDATION_SUPPLY - FOUNDER_SUPPLY - ADVISOR_SUPPLY;
   uint256 private constant MAX_RAISE_IN_USD = 5e7; // Maximum raise of $50M
-  uint256 private constant TOKEN_PRICE_IN_CENTS = 333; // Target token price without a discount
+  uint256 private constant TOKEN_PRICE_IN_CENTS = 61; // Target token price
 
   // Wei ether with two extra decimal places. Useful for conversion when we set the ether price
   uint256 private constant WEI_PER_ETHER_TWO_DECIMALS = 1e20;
