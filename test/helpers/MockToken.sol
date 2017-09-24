@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 import '../../contracts/Bloom.sol';
-import "../../contracts/MiniMeIrrevocableVestedToken.sol";
+import "../../contracts/MiniMeVestedToken.sol";
 
 contract MockToken is Bloom {
   function MockToken() Bloom(address(this)) {

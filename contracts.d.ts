@@ -35,14 +35,6 @@ export interface ApproveAndCallFallBackInstance extends ContractInstance {
 }
 
 export interface BloomInstance extends ContractInstance {
-  grantVestedTokens(
-    to: Address,
-    value: UInt,
-    start: UInt,
-    cliff: UInt,
-    vesting: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
   tokenGrantsCount(
     holder: Address,
     options?: TransactionOptions
@@ -74,7 +66,7 @@ export interface BloomInstance extends ContractInstance {
     unnamed0: Address,
     unnamed1: UInt,
     options?: TransactionOptions
-  ): Promise<[Address, UInt, UInt, UInt, UInt]>,
+  ): Promise<[Address, UInt, UInt, UInt, UInt, boolean, boolean]>,
   decimals(options?: TransactionOptions): Promise<UInt>,
   changeController(
     newController: Address,
@@ -111,6 +103,16 @@ export interface BloomInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<boolean>,
   symbol(options?: TransactionOptions): Promise<string>,
+  grantVestedTokens(
+    to: Address,
+    value: UInt,
+    start: UInt,
+    cliff: UInt,
+    vesting: UInt,
+    revokable: boolean,
+    burnsOnRevoke: boolean,
+    options?: TransactionOptions
+  ): Promise<void>,
   totalSupplyAt(blockNumber: UInt, options?: TransactionOptions): Promise<UInt>,
   transfer(
     to: Address,
@@ -143,8 +145,8 @@ export interface BloomInstance extends ContractInstance {
   claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
   tokenFactory(options?: TransactionOptions): Promise<Address>,
   revokeTokenGrant(
-    unnamed2: Address,
-    unnamed3: UInt,
+    holder: Address,
+    grantId: UInt,
     options?: TransactionOptions
   ): Promise<void>,
   enableTransfers(
@@ -159,27 +161,27 @@ export interface BloomInstance extends ContractInstance {
 }
 
 export interface BloomTokenSaleInstance extends ContractInstance {
-  endBlock(options?: TransactionOptions): Promise<UInt>,
   setToken(token: Address, options?: TransactionOptions): Promise<void>,
   rate(options?: TransactionOptions): Promise<UInt>,
+  endTime(options?: TransactionOptions): Promise<UInt>,
   cap(options?: TransactionOptions): Promise<UInt>,
-  unpause(options?: TransactionOptions): Promise<boolean>,
+  unpause(options?: TransactionOptions): Promise<void>,
   weiRaised(options?: TransactionOptions): Promise<UInt>,
-  startBlock(options?: TransactionOptions): Promise<UInt>,
   onTransfer(
     from: Address,
-    unnamed4: Address,
-    unnamed5: UInt,
+    unnamed2: Address,
+    unnamed3: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   wallet(options?: TransactionOptions): Promise<Address>,
   paused(options?: TransactionOptions): Promise<boolean>,
   finishConfiguration(options?: TransactionOptions): Promise<boolean>,
+  startTime(options?: TransactionOptions): Promise<UInt>,
   setEtherPriceInCents(
     cents: UInt,
     options?: TransactionOptions
   ): Promise<void>,
-  pause(options?: TransactionOptions): Promise<boolean>,
+  pause(options?: TransactionOptions): Promise<void>,
   configured(options?: TransactionOptions): Promise<boolean>,
   owner(options?: TransactionOptions): Promise<Address>,
   TOTAL_SUPPLY(options?: TransactionOptions): Promise<UInt>,
@@ -191,9 +193,9 @@ export interface BloomTokenSaleInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<void>,
   onApprove(
-    unnamed6: Address,
-    unnamed7: Address,
-    unnamed8: UInt,
+    unnamed4: Address,
+    unnamed5: Address,
+    unnamed6: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   allocateSupply(options?: TransactionOptions): Promise<void>,
@@ -210,12 +212,12 @@ export interface BloomTokenSaleInstance extends ContractInstance {
 }
 
 export interface CappedCrowdsaleInstance extends ContractInstance {
-  endBlock(options?: TransactionOptions): Promise<UInt>,
   rate(options?: TransactionOptions): Promise<UInt>,
+  endTime(options?: TransactionOptions): Promise<UInt>,
   cap(options?: TransactionOptions): Promise<UInt>,
   weiRaised(options?: TransactionOptions): Promise<UInt>,
-  startBlock(options?: TransactionOptions): Promise<UInt>,
   wallet(options?: TransactionOptions): Promise<Address>,
+  startTime(options?: TransactionOptions): Promise<UInt>,
   hasEnded(options?: TransactionOptions): Promise<boolean>,
   proxyPayment(owner: Address, options?: TransactionOptions): Promise<boolean>
 }
@@ -239,11 +241,11 @@ export interface ControlledInstance extends ContractInstance {
 }
 
 export interface CrowdsaleInstance extends ContractInstance {
-  endBlock(options?: TransactionOptions): Promise<UInt>,
   rate(options?: TransactionOptions): Promise<UInt>,
+  endTime(options?: TransactionOptions): Promise<UInt>,
   weiRaised(options?: TransactionOptions): Promise<UInt>,
-  startBlock(options?: TransactionOptions): Promise<UInt>,
   wallet(options?: TransactionOptions): Promise<Address>,
+  startTime(options?: TransactionOptions): Promise<UInt>,
   hasEnded(options?: TransactionOptions): Promise<boolean>,
   proxyPayment(owner: Address, options?: TransactionOptions): Promise<boolean>
 }
@@ -255,130 +257,6 @@ export interface MigrationsInstance extends ContractInstance {
   last_completed_migration(options?: TransactionOptions): Promise<UInt>,
   owner(options?: TransactionOptions): Promise<Address>,
   setCompleted(completed: UInt, options?: TransactionOptions): Promise<void>
-}
-
-export interface MiniMeIrrevocableVestedTokenInstance extends ContractInstance {
-  grantVestedTokens(
-    to: Address,
-    value: UInt,
-    start: UInt,
-    cliff: UInt,
-    vesting: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
-  tokenGrantsCount(
-    holder: Address,
-    options?: TransactionOptions
-  ): Promise<UInt>,
-  name(options?: TransactionOptions): Promise<string>,
-  approve(
-    spender: Address,
-    amount: UInt,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  spendableBalanceOf(
-    holder: Address,
-    options?: TransactionOptions
-  ): Promise<UInt>,
-  creationBlock(options?: TransactionOptions): Promise<UInt>,
-  totalSupply(options?: TransactionOptions): Promise<UInt>,
-  setCanCreateGrants(
-    addr: Address,
-    allowed: boolean,
-    options?: TransactionOptions
-  ): Promise<void>,
-  transferFrom(
-    from: Address,
-    to: Address,
-    value: UInt,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  grants(
-    unnamed9: Address,
-    unnamed10: UInt,
-    options?: TransactionOptions
-  ): Promise<[Address, UInt, UInt, UInt, UInt]>,
-  decimals(options?: TransactionOptions): Promise<UInt>,
-  changeController(
-    newController: Address,
-    options?: TransactionOptions
-  ): Promise<void>,
-  balanceOfAt(
-    owner: Address,
-    blockNumber: UInt,
-    options?: TransactionOptions
-  ): Promise<UInt>,
-  version(options?: TransactionOptions): Promise<string>,
-  tokenGrant(
-    holder: Address,
-    grantId: UInt,
-    options?: TransactionOptions
-  ): Promise<[Address, UInt, UInt, UInt, UInt, UInt]>,
-  createCloneToken(
-    cloneTokenName: string,
-    cloneDecimalUnits: UInt,
-    cloneTokenSymbol: string,
-    snapshotBlock: UInt,
-    transfersEnabled: boolean,
-    options?: TransactionOptions
-  ): Promise<Address>,
-  lastTokenIsTransferableDate(
-    holder: Address,
-    options?: TransactionOptions
-  ): Promise<UInt>,
-  balanceOf(owner: Address, options?: TransactionOptions): Promise<UInt>,
-  parentToken(options?: TransactionOptions): Promise<Address>,
-  generateTokens(
-    owner: Address,
-    amount: UInt,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  symbol(options?: TransactionOptions): Promise<string>,
-  totalSupplyAt(blockNumber: UInt, options?: TransactionOptions): Promise<UInt>,
-  transfer(
-    to: Address,
-    value: UInt,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  transfersEnabled(options?: TransactionOptions): Promise<boolean>,
-  parentSnapShotBlock(options?: TransactionOptions): Promise<UInt>,
-  approveAndCall(
-    spender: Address,
-    amount: UInt,
-    extraData: string,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  transferableTokens(
-    holder: Address,
-    time: UInt,
-    options?: TransactionOptions
-  ): Promise<UInt>,
-  destroyTokens(
-    owner: Address,
-    amount: UInt,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  allowance(
-    owner: Address,
-    spender: Address,
-    options?: TransactionOptions
-  ): Promise<UInt>,
-  claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
-  tokenFactory(options?: TransactionOptions): Promise<Address>,
-  revokeTokenGrant(
-    unnamed11: Address,
-    unnamed12: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
-  enableTransfers(
-    transfersEnabled: boolean,
-    options?: TransactionOptions
-  ): Promise<void>,
-  controller(options?: TransactionOptions): Promise<Address>,
-  changeVestingWhitelister(
-    newWhitelister: Address,
-    options?: TransactionOptions
-  ): Promise<void>
 }
 
 export interface MiniMeTokenInstance extends ContractInstance {
@@ -468,73 +346,128 @@ export interface MiniMeTokenFactoryInstance extends ContractInstance {
   ): Promise<Address>
 }
 
-export interface MultiSigWalletInstance extends ContractInstance {
-  owners(unnamed13: UInt, options?: TransactionOptions): Promise<Address>,
-  removeOwner(owner: Address, options?: TransactionOptions): Promise<void>,
-  revokeConfirmation(
-    transactionId: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
-  isOwner(unnamed14: Address, options?: TransactionOptions): Promise<boolean>,
-  confirmations(
-    unnamed15: UInt,
-    unnamed16: Address,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  getTransactionCount(
-    pending: boolean,
-    executed: boolean,
+export interface MiniMeVestedTokenInstance extends ContractInstance {
+  tokenGrantsCount(
+    holder: Address,
     options?: TransactionOptions
   ): Promise<UInt>,
-  addOwner(owner: Address, options?: TransactionOptions): Promise<void>,
-  isConfirmed(
-    transactionId: UInt,
+  name(options?: TransactionOptions): Promise<string>,
+  approve(
+    spender: Address,
+    amount: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
-  getConfirmationCount(
-    transactionId: UInt,
+  spendableBalanceOf(
+    holder: Address,
     options?: TransactionOptions
   ): Promise<UInt>,
-  transactions(
-    unnamed17: UInt,
-    options?: TransactionOptions
-  ): Promise<[Address, UInt, string, boolean]>,
-  getOwners(options?: TransactionOptions): Promise<Address[]>,
-  getTransactionIds(
-    from: UInt,
-    to: UInt,
-    pending: boolean,
-    executed: boolean,
-    options?: TransactionOptions
-  ): Promise<UInt[]>,
-  getConfirmations(
-    transactionId: UInt,
-    options?: TransactionOptions
-  ): Promise<Address[]>,
-  transactionCount(options?: TransactionOptions): Promise<UInt>,
-  changeRequirement(
-    required: UInt,
+  creationBlock(options?: TransactionOptions): Promise<UInt>,
+  totalSupply(options?: TransactionOptions): Promise<UInt>,
+  setCanCreateGrants(
+    addr: Address,
+    allowed: boolean,
     options?: TransactionOptions
   ): Promise<void>,
-  confirmTransaction(
-    transactionId: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
-  submitTransaction(
-    destination: Address,
+  transferFrom(
+    from: Address,
+    to: Address,
     value: UInt,
-    data: string,
     options?: TransactionOptions
-  ): Promise<UInt>,
-  MAX_OWNER_COUNT(options?: TransactionOptions): Promise<UInt>,
-  required(options?: TransactionOptions): Promise<UInt>,
-  replaceOwner(
-    owner: Address,
-    newOwner: Address,
+  ): Promise<boolean>,
+  grants(
+    unnamed7: Address,
+    unnamed8: UInt,
+    options?: TransactionOptions
+  ): Promise<[Address, UInt, UInt, UInt, UInt, boolean, boolean]>,
+  decimals(options?: TransactionOptions): Promise<UInt>,
+  changeController(
+    newController: Address,
     options?: TransactionOptions
   ): Promise<void>,
-  executeTransaction(
-    transactionId: UInt,
+  balanceOfAt(
+    owner: Address,
+    blockNumber: UInt,
+    options?: TransactionOptions
+  ): Promise<UInt>,
+  version(options?: TransactionOptions): Promise<string>,
+  tokenGrant(
+    holder: Address,
+    grantId: UInt,
+    options?: TransactionOptions
+  ): Promise<[Address, UInt, UInt, UInt, UInt, UInt]>,
+  createCloneToken(
+    cloneTokenName: string,
+    cloneDecimalUnits: UInt,
+    cloneTokenSymbol: string,
+    snapshotBlock: UInt,
+    transfersEnabled: boolean,
+    options?: TransactionOptions
+  ): Promise<Address>,
+  lastTokenIsTransferableDate(
+    holder: Address,
+    options?: TransactionOptions
+  ): Promise<UInt>,
+  balanceOf(owner: Address, options?: TransactionOptions): Promise<UInt>,
+  parentToken(options?: TransactionOptions): Promise<Address>,
+  generateTokens(
+    owner: Address,
+    amount: UInt,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  symbol(options?: TransactionOptions): Promise<string>,
+  grantVestedTokens(
+    to: Address,
+    value: UInt,
+    start: UInt,
+    cliff: UInt,
+    vesting: UInt,
+    revokable: boolean,
+    burnsOnRevoke: boolean,
+    options?: TransactionOptions
+  ): Promise<void>,
+  totalSupplyAt(blockNumber: UInt, options?: TransactionOptions): Promise<UInt>,
+  transfer(
+    to: Address,
+    value: UInt,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  transfersEnabled(options?: TransactionOptions): Promise<boolean>,
+  parentSnapShotBlock(options?: TransactionOptions): Promise<UInt>,
+  approveAndCall(
+    spender: Address,
+    amount: UInt,
+    extraData: string,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  transferableTokens(
+    holder: Address,
+    time: UInt,
+    options?: TransactionOptions
+  ): Promise<UInt>,
+  destroyTokens(
+    owner: Address,
+    amount: UInt,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  allowance(
+    owner: Address,
+    spender: Address,
+    options?: TransactionOptions
+  ): Promise<UInt>,
+  claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
+  tokenFactory(options?: TransactionOptions): Promise<Address>,
+  revokeTokenGrant(
+    holder: Address,
+    grantId: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
+  enableTransfers(
+    transfersEnabled: boolean,
+    options?: TransactionOptions
+  ): Promise<void>,
+  controller(options?: TransactionOptions): Promise<Address>,
+  changeVestingWhitelister(
+    newWhitelister: Address,
     options?: TransactionOptions
   ): Promise<void>
 }
@@ -548,9 +481,9 @@ export interface OwnableInstance extends ContractInstance {
 }
 
 export interface PausableInstance extends ContractInstance {
-  unpause(options?: TransactionOptions): Promise<boolean>,
+  unpause(options?: TransactionOptions): Promise<void>,
   paused(options?: TransactionOptions): Promise<boolean>,
-  pause(options?: TransactionOptions): Promise<boolean>,
+  pause(options?: TransactionOptions): Promise<void>,
   owner(options?: TransactionOptions): Promise<Address>,
   transferOwnership(
     newOwner: Address,

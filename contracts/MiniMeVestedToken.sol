@@ -15,7 +15,7 @@ import "zeppelin/math/Math.sol";
     MiniMeToken – Copyright 2017, Jordi Baylina (Giveth)
  */
 
-// @dev MiniMeIrrevocableVestedToken is a derived version of MiniMeToken adding the
+// @dev MiniMeVestedToken is a derived version of MiniMeToken adding the
 // ability to createTokenGrants which are basically a transfer that limits the
 // receiver of the tokens how can he spend them over time.
 
@@ -23,20 +23,21 @@ import "zeppelin/math/Math.sol";
 // Vanilla cloning ANT will clone it into a MiniMeToken without vesting.
 // More complex cloning could account for past vesting calendars.
 
-contract MiniMeIrrevocableVestedToken is MiniMeToken {
+contract MiniMeVestedToken is MiniMeToken {
   using SafeMath for uint256;
   using Math for uint64;
 
-  // Keep the struct at 2 sstores (1 slot for value + 64 * 3 (dates) + 20 (address) = 2 slots (2nd slot is 212 bytes, lower than 256))
   struct TokenGrant {
-    address granter;
-    uint256 value;
+    address granter;     // 20 bytes
+    uint256 value;       // 32 bytes
     uint64 cliff;
     uint64 vesting;
-    uint64 start;
-  }
+    uint64 start;        // 3 * 8 = 24 bytes
+    bool revokable;
+    bool burnsOnRevoke;  // 2 * 1 = 2 bits? or 2 bytes?
+  } // total 78 bytes = 3 sstore per operation (32 per sstore)
 
-  event NewTokenGrant(address indexed from, address indexed to, uint256 value, uint64 start, uint64 cliff, uint64 vesting);
+  event NewTokenGrant(address indexed from, address indexed to, uint256 value, uint256 grantId);
 
   mapping (address => TokenGrant[]) public grants;
 
@@ -53,7 +54,7 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     _;
   }
 
-  function MiniMeIrrevocableVestedToken (
+  function MiniMeVestedToken (
       address _tokenFactory,
       address _parentToken,
       uint _parentSnapShotBlock,
@@ -90,8 +91,10 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     uint256 _value,
     uint64 _start,
     uint64 _cliff,
-    uint64 _vesting) public {
-
+    uint64 _vesting,
+    bool _revokable,
+    bool _burnsOnRevoke
+  ) public {
     // Check start, cliff and vesting are properly order to ensure correct functionality of the formula.
     require(_cliff >= _start);
     require(_vesting >= _start);
@@ -100,12 +103,21 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     require(canCreateGrants[msg.sender]);
     require(tokenGrantsCount(_to) < 20);   // To prevent a user being spammed and have his balance locked (out of gas attack when calculating vesting).
 
-    TokenGrant memory grant = TokenGrant(msg.sender, _value, _cliff, _vesting, _start);
-    grants[_to].push(grant);
+    TokenGrant memory grant = TokenGrant(
+      _revokable ? msg.sender : 0,
+      _value,
+      _cliff,
+      _vesting,
+      _start,
+      _revokable,
+      _burnsOnRevoke
+    );
+
+    uint256 count = grants[_to].push(grant);
 
     assert(transfer(_to, _value));
 
-    NewTokenGrant(msg.sender, _to, _value, _cliff, _vesting, _start);
+    NewTokenGrant(msg.sender, _to, _value, count - 1);
   }
 
   function setCanCreateGrants(address _addr, bool _allowed)
@@ -124,9 +136,30 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     doSetCanCreateGrants(vestingWhitelister, true);
   }
 
-  // @dev Not allow token grants
-  function revokeTokenGrant(address, uint) public {
-    revert();
+  /**
+   * @dev Revoke the grant of tokens of a specifed address.
+   * @param _holder The address which will have its tokens revoked.
+   * @param _grantId The id of the token grant.
+   */
+  function revokeTokenGrant(address _holder, uint256 _grantId) public {
+    TokenGrant storage grant = grants[_holder][_grantId];
+
+    require(grant.revokable);
+    require(grant.granter == msg.sender); // Only granter can revoke it
+
+    address receiver = grant.burnsOnRevoke ? 0xdead : msg.sender;
+
+    uint256 nonVested = nonVestedTokens(grant, uint64(now));
+
+    // remove grant from array
+    delete grants[_holder][_grantId];
+    grants[_holder][_grantId] = grants[_holder][grants[_holder].length.sub(1)];
+    grants[_holder].length -= 1;
+
+    updateValueAtNow(balances[receiver], balanceOf(receiver) + nonVested);
+    updateValueAtNow(balances[_holder], balanceOf(_holder) - nonVested);
+
+    Transfer(_holder, receiver, nonVested);
   }
 
   //
