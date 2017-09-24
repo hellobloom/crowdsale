@@ -9,8 +9,8 @@ chai
   .use(chaiBignumber(web3.BigNumber))
   .should();
 
-// const MiniMeIrrevocableVestedToken = artifacts.require(
-//   "MiniMeIrrevocableVestedToken"
+// const MiniMeVestedToken = artifacts.require(
+//   "MiniMeVestedToken"
 // );
 const MockSale = artifacts.require("./helpers/MockSale");
 const MockToken = artifacts.require("./helpers/MockToken");
@@ -33,7 +33,7 @@ const timer = (s: any) => {
   });
 };
 
-contract("MiniMeIrrevocableVestedToken", function(
+contract("MiniMeVestedToken", function(
   [granter, receiver, secondGranter, user]
 ) {
   let token: any;

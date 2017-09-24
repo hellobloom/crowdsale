@@ -15,7 +15,7 @@ import "zeppelin/math/Math.sol";
     MiniMeToken – Copyright 2017, Jordi Baylina (Giveth)
  */
 
-// @dev MiniMeIrrevocableVestedToken is a derived version of MiniMeToken adding the
+// @dev MiniMeVestedToken is a derived version of MiniMeToken adding the
 // ability to createTokenGrants which are basically a transfer that limits the
 // receiver of the tokens how can he spend them over time.
 
@@ -23,7 +23,7 @@ import "zeppelin/math/Math.sol";
 // Vanilla cloning ANT will clone it into a MiniMeToken without vesting.
 // More complex cloning could account for past vesting calendars.
 
-contract MiniMeIrrevocableVestedToken is MiniMeToken {
+contract MiniMeVestedToken is MiniMeToken {
   using SafeMath for uint256;
   using Math for uint64;
 
@@ -54,7 +54,7 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken {
     _;
   }
 
-  function MiniMeIrrevocableVestedToken (
+  function MiniMeVestedToken (
       address _tokenFactory,
       address _parentToken,
       uint _parentSnapShotBlock,

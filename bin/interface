@@ -33,4 +33,4 @@ summarize() {
 
 summarize Bloom
 summarize BloomTokenSale
-summarize MiniMeIrrevocableVestedToken
+summarize MiniMeVestedToken
