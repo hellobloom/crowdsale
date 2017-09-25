@@ -485,4 +485,48 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     investorBalance.should.be.bignumber.equal(5000);
     spendableBalance.should.be.bignumber.equal(0);
   });
+
+  describe("changing controller after sale", () => {
+    let sale: any;
+    let token: any;
+
+    beforeEach(async () => {
+      const latestTime = latestBlockTime();
+
+      const creation = await createSaleWithToken(
+        latestTime + 50,
+        latestTime + 100
+      );
+
+      sale = creation.sale;
+      token = creation.token;
+
+      await timer(150);
+    });
+
+    it("supports changing the controller when the sale has been finalized", async () => {
+      await sale.finalize();
+
+      await sale.changeTokenController("0x0");
+
+      const newController = await token.controller();
+      newController.should.be.equal(
+        "0x0000000000000000000000000000000000000000"
+      );
+    });
+
+    it("must be changed by the owner", async () => {
+      await sale.finalize();
+
+      await sale
+        .changeTokenController("0x0", { from: investor })
+        .should.be.rejectedWith("invalid opcode");
+    });
+
+    it("must be changed after finalization", async () => {
+      await sale
+        .changeTokenController("0x0")
+        .should.be.rejectedWith("invalid opcode");
+    });
+  });
 });
