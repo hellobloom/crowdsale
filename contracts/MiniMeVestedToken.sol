@@ -1,28 +1,27 @@
 pragma solidity ^0.4.15;
 
-// Slightly modified Zeppelin's Vested Token deriving MiniMeToken
-
 import "./MiniMeToken.sol";
 import "zeppelin/math/SafeMath.sol";
 import "zeppelin/math/Math.sol";
 
 /*
-    Copyright 2017, Jorge Izquierdo (Aragon Foundation)
-
-    Based on VestedToken.sol from https://github.com/OpenZeppelin/zeppelin-solidity
+    Based on MiniMeIrrevocableVestedToken from https://git.io/vdTQI
 
     SafeMath – Copyright (c) 2016 Smart Contract Solutions, Inc.
     MiniMeToken – Copyright 2017, Jordi Baylina (Giveth)
+    Aragon Foundation - Copyright 2017, Jorge Izquierdo
  */
 
-// @dev MiniMeVestedToken is a derived version of MiniMeToken adding the
-// ability to createTokenGrants which are basically a transfer that limits the
-// receiver of the tokens how can he spend them over time.
-
+// @dev MiniMeVestedToken is a combination of the MiniMeToken adding the ability to
+// createTokenGrants and revokeTokenGrants from VestedToken by OpenZeppelin.
+//
+// You can think of this contact as being a merging of VestedToken and MiniMeToken
+// that makes small modifications for checking and altering balance so that the two
+// separate contracts interoperate properly.
+//
 // For simplicity, token grants are not saved in MiniMe type checkpoints.
-// Vanilla cloning ANT will clone it into a MiniMeToken without vesting.
+// Vanilla cloning BLT will clone it into a MiniMeToken without vesting.
 // More complex cloning could account for past vesting calendars.
-
 contract MiniMeVestedToken is MiniMeToken {
   using SafeMath for uint256;
   using Math for uint64;
@@ -86,6 +85,14 @@ contract MiniMeVestedToken is MiniMeToken {
     return transferableTokens(_holder, uint64(now));
   }
 
+  /**
+   * @dev Grant tokens to a specified address
+   * @param _to address The address which the tokens will be granted to.
+   * @param _value uint256 The amount of tokens to be granted.
+   * @param _start uint64 Time of the beginning of the grant.
+   * @param _cliff uint64 Time of the cliff period.
+   * @param _vesting uint64 The vesting period.
+   */
   function grantVestedTokens(
     address _to,
     uint256 _value,
@@ -162,7 +169,11 @@ contract MiniMeVestedToken is MiniMeToken {
     Transfer(_holder, receiver, nonVested);
   }
 
-  //
+  /**
+   * @dev Check the amount of grants that an address has.
+   * @param _holder The holder of the grants.
+   * @return A uint256 representing the total amount of grants.
+   */
   function tokenGrantsCount(address _holder) constant public returns (uint index) {
     return grants[_holder].length;
   }
@@ -204,22 +215,30 @@ contract MiniMeVestedToken is MiniMeToken {
     );
   }
 
-  //  transferableTokens
-  //   |                     /--------   vestedTokens
-  //   |                    /
-  //   |                   /
-  //   |                  /
-  //   |                 /
-  //   |                /
-  //   |              .|
-  //   |            .  |
-  //   |          .    |
-  //   |        .      |
-  //   |      .        |
-  //   |    .          |
-  //   +===+===========+---------+----------> time
-  //      Start       Clift    Vesting
-
+  /**
+   * @dev Calculate amount of vested tokens at a specific time
+   * @param tokens uint256 The amount of tokens granted
+   * @param time uint64 The time to be checked
+   * @param start uint64 The time representing the beginning of the grant
+   * @param cliff uint64  The cliff period, the period before nothing can be paid out
+   * @param vesting uint64 The vesting period
+   * @return An uint256 representing the amount of vested tokens of a specific grant
+   *  transferableTokens
+   *   |                         _/--------   vestedTokens rect
+   *   |                       _/
+   *   |                     _/
+   *   |                   _/
+   *   |                 _/
+   *   |                /
+   *   |              .|
+   *   |            .  |
+   *   |          .    |
+   *   |        .      |
+   *   |      .        |
+   *   |    .          |
+   *   +===+===========+---------+----------> time
+   *      Start       Cliff    Vesting
+   */
   function calculateVestedTokens(
     uint256 tokens,
     uint256 time,
@@ -244,6 +263,13 @@ contract MiniMeVestedToken is MiniMeToken {
     return vested;
   }
 
+  /**
+   * @dev Calculate the amount of non vested tokens at a specific time.
+   * @param grant TokenGrant The grant to be checked.
+   * @param time uint64 The time to be checked
+   * @return An uint256 representing the amount of non vested tokens of a specific grant on the
+   * passed time frame.
+   */
   function nonVestedTokens(TokenGrant storage grant, uint64 time) internal constant returns (uint256) {
     // Of all the tokens of the grant, how many of them are not vested?
     // grantValue - vestedTokens
