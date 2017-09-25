@@ -2,7 +2,7 @@ require("babel-register");
 require("babel-polyfill");
 
 var MiniMeTokenFactory = artifacts.require("MiniMeTokenFactory");
-var Bloom = artifacts.require("./Bloom.sol");
+var BLT = artifacts.require("./BLT.sol");
 var BloomTokenSale = artifacts.require("./BloomTokenSale.sol");
 
 module.exports = function deploy(deployer) {
@@ -31,10 +31,10 @@ module.exports = function deploy(deployer) {
           })
           .then(s => {
             sale = s;
-            return deployer.deploy(Bloom, factory.address);
+            return deployer.deploy(BLT, factory.address);
           })
           .then(() => {
-            return Bloom.deployed();
+            return BLT.deployed();
           })
           .then(b => {
             bloom = b;

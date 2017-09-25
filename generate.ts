@@ -53,8 +53,6 @@ interface Definition {
   abi: Abi;
 }
 
-const bloomContract: Definition = require("./build/contracts/bloom.json");
-
 function generateHeader(): string {
   return `
     import * as Web3 from "web3";

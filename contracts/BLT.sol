@@ -3,11 +3,11 @@ pragma solidity ^0.4.15;
 import "./MiniMeVestedToken.sol";
 
 /**
- * @title Bloom
+ * @title BLT
  * @dev Bloom's network token.
  */
-contract Bloom is MiniMeVestedToken {
-  function Bloom(address _tokenFactory) MiniMeVestedToken(
+contract BLT is MiniMeVestedToken {
+  function BLT(address _tokenFactory) MiniMeVestedToken(
     _tokenFactory,
     0x0,           // no parent token
     0,             // no snapshot block number from parent
