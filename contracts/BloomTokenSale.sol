@@ -42,9 +42,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     address _wallet,
     uint256 _cap
   ) Crowdsale(_startTime, _endTime, _rate, _wallet)
-    CappedCrowdsale(_cap) {
-      paused = true;
-    }
+    CappedCrowdsale(_cap) { }
 
   // @dev Link the token to the Crowdsale
   // @param _token address of the deployed token

@@ -33,7 +33,6 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
-    await sale.unpause();
     await sale.finishConfiguration();
 
     return { sale, token };
@@ -79,7 +78,6 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const controllerBalanceBefore = await token.balanceOf(sale.address);
 
     await sale.allocateSupply();
-    await sale.unpause();
 
     const supplyAfter = await token.totalSupply();
     const controllerBalanceAfter = await token.balanceOf(sale.address);
@@ -448,7 +446,6 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale.setToken(token.address);
     await sale.setEtherPriceInCents(40000);
     await sale.allocateSupply();
-    await sale.unpause();
     await sale.finishConfiguration();
 
     await timer(5);
