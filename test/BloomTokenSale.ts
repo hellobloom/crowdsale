@@ -13,7 +13,7 @@ chai
   .should();
 
 const BloomTokenSale = artifacts.require("BloomTokenSale");
-const Bloom = artifacts.require("Bloom");
+const BLT = artifacts.require("BLT");
 
 contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   const createSaleWithToken = async function(
@@ -29,7 +29,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       cap
     );
 
-    const token = await Bloom.new();
+    const token = await BLT.new();
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
@@ -71,7 +71,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       new BigNumber("1.66667e23")
     );
 
-    const token = await Bloom.new();
+    const token = await BLT.new();
     await token.changeController(sale.address);
     await sale.setToken(token.address);
 
@@ -100,7 +100,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       new BigNumber("1.66667e23")
     );
 
-    const token = await Bloom.new();
+    const token = await BLT.new();
     await token.changeController(sale.address);
     await sale.setToken(token.address);
 
@@ -379,7 +379,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     timer(5);
 
-    const token = await Bloom.new();
+    const token = await BLT.new();
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
@@ -443,7 +443,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       1
     );
 
-    const token = await Bloom.new();
+    const token = await BLT.new();
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.setEtherPriceInCents(40000);

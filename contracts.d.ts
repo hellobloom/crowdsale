@@ -34,7 +34,58 @@ export interface ApproveAndCallFallBackInstance extends ContractInstance {
   ): Promise<void>
 }
 
-export interface BloomInstance extends ContractInstance {
+export interface BloomTokenSaleInstance extends ContractInstance {
+  setToken(token: Address, options?: TransactionOptions): Promise<void>,
+  rate(options?: TransactionOptions): Promise<UInt>,
+  endTime(options?: TransactionOptions): Promise<UInt>,
+  cap(options?: TransactionOptions): Promise<UInt>,
+  unpause(options?: TransactionOptions): Promise<void>,
+  weiRaised(options?: TransactionOptions): Promise<UInt>,
+  onTransfer(
+    from: Address,
+    unnamed0: Address,
+    unnamed1: UInt,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  wallet(options?: TransactionOptions): Promise<Address>,
+  paused(options?: TransactionOptions): Promise<boolean>,
+  finishConfiguration(options?: TransactionOptions): Promise<boolean>,
+  startTime(options?: TransactionOptions): Promise<UInt>,
+  setEtherPriceInCents(
+    cents: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
+  pause(options?: TransactionOptions): Promise<void>,
+  configured(options?: TransactionOptions): Promise<boolean>,
+  owner(options?: TransactionOptions): Promise<Address>,
+  TOTAL_SUPPLY(options?: TransactionOptions): Promise<UInt>,
+  allocatePresaleTokens(
+    receiver: Address,
+    amount: UInt,
+    cliffDate: UInt,
+    vestingDate: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
+  onApprove(
+    unnamed2: Address,
+    unnamed3: Address,
+    unnamed4: UInt,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  allocateSupply(options?: TransactionOptions): Promise<void>,
+  hasEnded(options?: TransactionOptions): Promise<boolean>,
+  transferOwnership(
+    newOwner: Address,
+    options?: TransactionOptions
+  ): Promise<void>,
+  proxyPayment(
+    beneficiary: Address,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  token(options?: TransactionOptions): Promise<Address>
+}
+
+export interface BLTInstance extends ContractInstance {
   tokenGrantsCount(
     holder: Address,
     options?: TransactionOptions
@@ -63,8 +114,8 @@ export interface BloomInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<boolean>,
   grants(
-    unnamed0: Address,
-    unnamed1: UInt,
+    unnamed5: Address,
+    unnamed6: UInt,
     options?: TransactionOptions
   ): Promise<[Address, UInt, UInt, UInt, UInt, boolean, boolean]>,
   decimals(options?: TransactionOptions): Promise<UInt>,
@@ -82,7 +133,7 @@ export interface BloomInstance extends ContractInstance {
     holder: Address,
     grantId: UInt,
     options?: TransactionOptions
-  ): Promise<[Address, UInt, UInt, UInt, UInt, UInt]>,
+  ): Promise<[Address, UInt, UInt, UInt, UInt, UInt, boolean, boolean]>,
   createCloneToken(
     cloneTokenName: string,
     cloneDecimalUnits: UInt,
@@ -158,57 +209,6 @@ export interface BloomInstance extends ContractInstance {
     newWhitelister: Address,
     options?: TransactionOptions
   ): Promise<void>
-}
-
-export interface BloomTokenSaleInstance extends ContractInstance {
-  setToken(token: Address, options?: TransactionOptions): Promise<void>,
-  rate(options?: TransactionOptions): Promise<UInt>,
-  endTime(options?: TransactionOptions): Promise<UInt>,
-  cap(options?: TransactionOptions): Promise<UInt>,
-  unpause(options?: TransactionOptions): Promise<void>,
-  weiRaised(options?: TransactionOptions): Promise<UInt>,
-  onTransfer(
-    from: Address,
-    unnamed2: Address,
-    unnamed3: UInt,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  wallet(options?: TransactionOptions): Promise<Address>,
-  paused(options?: TransactionOptions): Promise<boolean>,
-  finishConfiguration(options?: TransactionOptions): Promise<boolean>,
-  startTime(options?: TransactionOptions): Promise<UInt>,
-  setEtherPriceInCents(
-    cents: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
-  pause(options?: TransactionOptions): Promise<void>,
-  configured(options?: TransactionOptions): Promise<boolean>,
-  owner(options?: TransactionOptions): Promise<Address>,
-  TOTAL_SUPPLY(options?: TransactionOptions): Promise<UInt>,
-  allocatePresaleTokens(
-    receiver: Address,
-    amount: UInt,
-    cliffDate: UInt,
-    vestingDate: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
-  onApprove(
-    unnamed4: Address,
-    unnamed5: Address,
-    unnamed6: UInt,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  allocateSupply(options?: TransactionOptions): Promise<void>,
-  hasEnded(options?: TransactionOptions): Promise<boolean>,
-  transferOwnership(
-    newOwner: Address,
-    options?: TransactionOptions
-  ): Promise<void>,
-  proxyPayment(
-    beneficiary: Address,
-    options?: TransactionOptions
-  ): Promise<boolean>,
-  token(options?: TransactionOptions): Promise<Address>
 }
 
 export interface CappedCrowdsaleInstance extends ContractInstance {
@@ -394,7 +394,7 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     holder: Address,
     grantId: UInt,
     options?: TransactionOptions
-  ): Promise<[Address, UInt, UInt, UInt, UInt, UInt]>,
+  ): Promise<[Address, UInt, UInt, UInt, UInt, UInt, boolean, boolean]>,
   createCloneToken(
     cloneTokenName: string,
     cloneDecimalUnits: UInt,

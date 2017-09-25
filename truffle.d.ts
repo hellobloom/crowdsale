@@ -1,6 +1,6 @@
 import * as Web3 from "web3";
 import {
-  BloomInstance,
+  BLTInstance,
   BloomTokenSaleInstance,
   MiniMeTokenInstance,
   MiniMeVestedTokenInstance
@@ -69,7 +69,7 @@ interface MockSaleInstance extends BloomTokenSaleInstance {
     options?: TransactionOptions
   ): Promise<void>;
 }
-interface MockTokenInstance extends BloomInstance {
+interface MockTokenInstance extends BLTInstance {
   canCreateGrants(subject: Address): any;
   addGranter(subject: Address): Promise<void>;
 }
@@ -81,11 +81,9 @@ interface ConfigurableMockInstance extends ContractInstance, Ownable {
 }
 
 interface Artifacts {
-  require(
-    name: "MiniMeVestedToken"
-  ): Contract<MiniMeVestedTokenInstance>;
+  require(name: "MiniMeVestedToken"): Contract<MiniMeVestedTokenInstance>;
   require(name: "BloomTokenSale"): Contract<BloomTokenSaleInstance>;
-  require(name: "Bloom"): Contract<BloomInstance>;
+  require(name: "BLT"): Contract<BLTInstance>;
   require(
     name: "./helpers/ConfigurableMock"
   ): Contract<ConfigurableMockInstance>;

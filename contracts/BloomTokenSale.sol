@@ -6,7 +6,7 @@ import "zeppelin/lifecycle/Pausable.sol";
 import "zeppelin/math/SafeMath.sol";
 import "./Configurable.sol";
 import "./CappedCrowdsale.sol";
-import "./Bloom.sol";
+import "./BLT.sol";
 
 /**
  * @title BloomTokenSale
@@ -17,7 +17,7 @@ import "./Bloom.sol";
 contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, Configurable {
   using SafeMath for uint256;
 
-  Bloom public token;
+  BLT public token;
 
   uint256 public constant TOTAL_SUPPLY = 15e25; // 150 million BLT with 18 decimals
   uint256 private constant FOUNDER_SUPPLY = 3e25; // 20% supply
@@ -48,7 +48,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @dev Link the token to the Crowdsale
   // @param _token address of the deployed token
   function setToken(address _token) configuration {
-    token = Bloom(_token);
+    token = BLT(_token);
   }
 
   // @dev Allocate our initial token supply
