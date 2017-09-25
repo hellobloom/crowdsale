@@ -6,6 +6,7 @@ import "zeppelin/lifecycle/Pausable.sol";
 import "zeppelin/math/SafeMath.sol";
 import "./Configurable.sol";
 import "./CappedCrowdsale.sol";
+import "./FinalizableCrowdsale.sol";
 import "./BLT.sol";
 
 /**
@@ -14,7 +15,7 @@ import "./BLT.sol";
  *   `Crowdsale` and `CappedCrowdsale` contracts, implemented the MiniMeToken controller interface,
  *   supports owner pausing, and has initial owner-only configuration setup.
  */
-contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, Configurable {
+contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, Configurable, FinalizableCrowdsale {
   using SafeMath for uint256;
 
   BLT public token;
@@ -97,6 +98,10 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     NewPresaleAllocation(_receiver, _amount);
   }
 
+  function changeTokenController(address _newController) onlyOwner whenFinalized public {
+    token.changeController(_newController);
+  }
+
   // @dev Transfer funds from the controller's address to the _beneficiary. Uses
   //   _weiAmount to compute the number of tokens purchased.
   // @param _beneficiary recipient of tokens
@@ -123,5 +128,10 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   the initial configuration phase is finished.
   function validPurchase() internal constant returns (bool) {
     return super.validPurchase() && configured;
+  }
+
+  modifier whenFinalized {
+    require(isFinalized);
+    _;
   }
 }

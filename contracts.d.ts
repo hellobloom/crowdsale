@@ -47,6 +47,7 @@ export interface BloomTokenSaleInstance extends ContractInstance {
     unnamed1: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
+  finalize(options?: TransactionOptions): Promise<void>,
   wallet(options?: TransactionOptions): Promise<Address>,
   paused(options?: TransactionOptions): Promise<boolean>,
   finishConfiguration(options?: TransactionOptions): Promise<boolean>,
@@ -57,6 +58,7 @@ export interface BloomTokenSaleInstance extends ContractInstance {
   ): Promise<void>,
   pause(options?: TransactionOptions): Promise<void>,
   configured(options?: TransactionOptions): Promise<boolean>,
+  isFinalized(options?: TransactionOptions): Promise<boolean>,
   owner(options?: TransactionOptions): Promise<Address>,
   TOTAL_SUPPLY(options?: TransactionOptions): Promise<UInt>,
   allocatePresaleTokens(
@@ -64,6 +66,10 @@ export interface BloomTokenSaleInstance extends ContractInstance {
     amount: UInt,
     cliffDate: UInt,
     vestingDate: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
+  changeTokenController(
+    newController: Address,
     options?: TransactionOptions
   ): Promise<void>,
   onApprove(
@@ -247,6 +253,23 @@ export interface CrowdsaleInstance extends ContractInstance {
   wallet(options?: TransactionOptions): Promise<Address>,
   startTime(options?: TransactionOptions): Promise<UInt>,
   hasEnded(options?: TransactionOptions): Promise<boolean>,
+  proxyPayment(owner: Address, options?: TransactionOptions): Promise<boolean>
+}
+
+export interface FinalizableCrowdsaleInstance extends ContractInstance {
+  rate(options?: TransactionOptions): Promise<UInt>,
+  endTime(options?: TransactionOptions): Promise<UInt>,
+  weiRaised(options?: TransactionOptions): Promise<UInt>,
+  finalize(options?: TransactionOptions): Promise<void>,
+  wallet(options?: TransactionOptions): Promise<Address>,
+  startTime(options?: TransactionOptions): Promise<UInt>,
+  isFinalized(options?: TransactionOptions): Promise<boolean>,
+  owner(options?: TransactionOptions): Promise<Address>,
+  hasEnded(options?: TransactionOptions): Promise<boolean>,
+  transferOwnership(
+    newOwner: Address,
+    options?: TransactionOptions
+  ): Promise<void>,
   proxyPayment(owner: Address, options?: TransactionOptions): Promise<boolean>
 }
 
