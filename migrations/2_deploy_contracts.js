@@ -49,9 +49,6 @@ module.exports = function deploy(deployer) {
           .then(() => {
             return sale.allocateSupply();
           })
-          .then(() => {
-            return sale.unpause();
-          })
           .catch(console.log);
       })
       .catch(error => console.log("Error: ", error));

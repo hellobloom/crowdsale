@@ -49,7 +49,6 @@ contract("MiniMeVestedToken", function(
     await token.changeController(sale.address);
 
     await sale.allocateSupply();
-    await sale.unpause();
     await sale.finishConfiguration();
     await token.addGranter(sale.address);
     await sale.grantInstantlyVestedTokens(granter, 100);
