@@ -493,7 +493,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestTime + 100
     );
 
-    await token.setCanCreateGrants(sale.address, true);
+    await token.changeVestingWhitelister(sale.address);
 
     await sale.allocatePresaleTokens(
       investor,
