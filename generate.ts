@@ -136,7 +136,7 @@ function translateOutputs(outputs: FunctionMemberInput[]) {
 }
 
 function translateOutput(output: FunctionMemberInput) {
-  return translateType(output.type);
+  return translateType(output.type, { UInt: "BigNumber.BigNumber" });
 }
 
 let unnamedArgumentNumber = 0;
@@ -159,7 +159,7 @@ function buildFunctionArgument(input: FunctionMemberInput): string {
   return `${name}: ${type}`;
 }
 
-function translateType(type: SolidityType): string {
+function translateType(type: SolidityType, options = { UInt: "UInt" }): string {
   switch (type) {
     case "string":
       return "string";
@@ -174,9 +174,9 @@ function translateType(type: SolidityType): string {
     case "uint8":
     case "uint64":
     case "uint256":
-      return "UInt";
+      return options.UInt;
     case "uint256[]":
-      return "UInt[]";
+      return `${options.UInt}[]`;
     default:
       throw `Unexpected case! ${type}`;
   }

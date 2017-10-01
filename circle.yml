@@ -9,4 +9,5 @@ dependencies:
 
 test:
   override:
+    - bin/compile-typings && git diff --exit-code
     - bin/test
