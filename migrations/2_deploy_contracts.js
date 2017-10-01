@@ -17,8 +17,8 @@ module.exports = function deploy(deployer) {
     deployer
       .deploy(
         BloomTokenSale,
-        block.timestamp + 1,
-        block.timestamp + 60 * 60 * 24,
+        1509206400, // October 28, 2017 at 9AM PDT
+        1511856000, // November 28, 2017 at 12AM PST
         1000,
         wallet,
         10000
