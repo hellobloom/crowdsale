@@ -36,11 +36,11 @@ export interface ApproveAndCallFallBackInstance extends ContractInstance {
 
 export interface BloomTokenSaleInstance extends ContractInstance {
   setToken(token: Address, options?: TransactionOptions): Promise<void>,
-  rate(options?: TransactionOptions): Promise<UInt>,
-  endTime(options?: TransactionOptions): Promise<UInt>,
-  cap(options?: TransactionOptions): Promise<UInt>,
+  rate(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  endTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  cap(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   unpause(options?: TransactionOptions): Promise<void>,
-  weiRaised(options?: TransactionOptions): Promise<UInt>,
+  weiRaised(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   onTransfer(
     from: Address,
     unnamed0: Address,
@@ -51,7 +51,7 @@ export interface BloomTokenSaleInstance extends ContractInstance {
   wallet(options?: TransactionOptions): Promise<Address>,
   paused(options?: TransactionOptions): Promise<boolean>,
   finishConfiguration(options?: TransactionOptions): Promise<boolean>,
-  startTime(options?: TransactionOptions): Promise<UInt>,
+  startTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   setEtherPriceInCents(
     cents: UInt,
     options?: TransactionOptions
@@ -60,7 +60,7 @@ export interface BloomTokenSaleInstance extends ContractInstance {
   configured(options?: TransactionOptions): Promise<boolean>,
   isFinalized(options?: TransactionOptions): Promise<boolean>,
   owner(options?: TransactionOptions): Promise<Address>,
-  TOTAL_SUPPLY(options?: TransactionOptions): Promise<UInt>,
+  TOTAL_SUPPLY(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   allocatePresaleTokens(
     receiver: Address,
     amount: UInt,
@@ -95,7 +95,7 @@ export interface BLTInstance extends ContractInstance {
   tokenGrantsCount(
     holder: Address,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   name(options?: TransactionOptions): Promise<string>,
   approve(
     spender: Address,
@@ -105,9 +105,9 @@ export interface BLTInstance extends ContractInstance {
   spendableBalanceOf(
     holder: Address,
     options?: TransactionOptions
-  ): Promise<UInt>,
-  creationBlock(options?: TransactionOptions): Promise<UInt>,
-  totalSupply(options?: TransactionOptions): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
+  creationBlock(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  totalSupply(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   setCanCreateGrants(
     addr: Address,
     allowed: boolean,
@@ -123,8 +123,18 @@ export interface BLTInstance extends ContractInstance {
     unnamed5: Address,
     unnamed6: UInt,
     options?: TransactionOptions
-  ): Promise<[Address, UInt, UInt, UInt, UInt, boolean, boolean]>,
-  decimals(options?: TransactionOptions): Promise<UInt>,
+  ): Promise<
+    [
+      Address,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      boolean,
+      boolean
+    ]
+  >,
+  decimals(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   changeController(
     newController: Address,
     options?: TransactionOptions
@@ -133,13 +143,24 @@ export interface BLTInstance extends ContractInstance {
     owner: Address,
     blockNumber: UInt,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   version(options?: TransactionOptions): Promise<string>,
   tokenGrant(
     holder: Address,
     grantId: UInt,
     options?: TransactionOptions
-  ): Promise<[Address, UInt, UInt, UInt, UInt, UInt, boolean, boolean]>,
+  ): Promise<
+    [
+      Address,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      boolean,
+      boolean
+    ]
+  >,
   createCloneToken(
     cloneTokenName: string,
     cloneDecimalUnits: UInt,
@@ -151,8 +172,11 @@ export interface BLTInstance extends ContractInstance {
   lastTokenIsTransferableDate(
     holder: Address,
     options?: TransactionOptions
-  ): Promise<UInt>,
-  balanceOf(owner: Address, options?: TransactionOptions): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
+  balanceOf(
+    owner: Address,
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   parentToken(options?: TransactionOptions): Promise<Address>,
   generateTokens(
     owner: Address,
@@ -170,14 +194,19 @@ export interface BLTInstance extends ContractInstance {
     burnsOnRevoke: boolean,
     options?: TransactionOptions
   ): Promise<void>,
-  totalSupplyAt(blockNumber: UInt, options?: TransactionOptions): Promise<UInt>,
+  totalSupplyAt(
+    blockNumber: UInt,
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   transfer(
     to: Address,
     value: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   transfersEnabled(options?: TransactionOptions): Promise<boolean>,
-  parentSnapShotBlock(options?: TransactionOptions): Promise<UInt>,
+  parentSnapShotBlock(
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   approveAndCall(
     spender: Address,
     amount: UInt,
@@ -188,7 +217,7 @@ export interface BLTInstance extends ContractInstance {
     holder: Address,
     time: UInt,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   destroyTokens(
     owner: Address,
     amount: UInt,
@@ -198,7 +227,7 @@ export interface BLTInstance extends ContractInstance {
     owner: Address,
     spender: Address,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
   tokenFactory(options?: TransactionOptions): Promise<Address>,
   revokeTokenGrant(
@@ -218,12 +247,12 @@ export interface BLTInstance extends ContractInstance {
 }
 
 export interface CappedCrowdsaleInstance extends ContractInstance {
-  rate(options?: TransactionOptions): Promise<UInt>,
-  endTime(options?: TransactionOptions): Promise<UInt>,
-  cap(options?: TransactionOptions): Promise<UInt>,
-  weiRaised(options?: TransactionOptions): Promise<UInt>,
+  rate(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  endTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  cap(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  weiRaised(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   wallet(options?: TransactionOptions): Promise<Address>,
-  startTime(options?: TransactionOptions): Promise<UInt>,
+  startTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   hasEnded(options?: TransactionOptions): Promise<boolean>,
   proxyPayment(owner: Address, options?: TransactionOptions): Promise<boolean>
 }
@@ -247,22 +276,22 @@ export interface ControlledInstance extends ContractInstance {
 }
 
 export interface CrowdsaleInstance extends ContractInstance {
-  rate(options?: TransactionOptions): Promise<UInt>,
-  endTime(options?: TransactionOptions): Promise<UInt>,
-  weiRaised(options?: TransactionOptions): Promise<UInt>,
+  rate(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  endTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  weiRaised(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   wallet(options?: TransactionOptions): Promise<Address>,
-  startTime(options?: TransactionOptions): Promise<UInt>,
+  startTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   hasEnded(options?: TransactionOptions): Promise<boolean>,
   proxyPayment(owner: Address, options?: TransactionOptions): Promise<boolean>
 }
 
 export interface FinalizableCrowdsaleInstance extends ContractInstance {
-  rate(options?: TransactionOptions): Promise<UInt>,
-  endTime(options?: TransactionOptions): Promise<UInt>,
-  weiRaised(options?: TransactionOptions): Promise<UInt>,
+  rate(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  endTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  weiRaised(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   finalize(options?: TransactionOptions): Promise<void>,
   wallet(options?: TransactionOptions): Promise<Address>,
-  startTime(options?: TransactionOptions): Promise<UInt>,
+  startTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   isFinalized(options?: TransactionOptions): Promise<boolean>,
   owner(options?: TransactionOptions): Promise<Address>,
   hasEnded(options?: TransactionOptions): Promise<boolean>,
@@ -277,7 +306,9 @@ export interface MathInstance extends ContractInstance {}
 
 export interface MigrationsInstance extends ContractInstance {
   upgrade(new_address: Address, options?: TransactionOptions): Promise<void>,
-  last_completed_migration(options?: TransactionOptions): Promise<UInt>,
+  last_completed_migration(
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   owner(options?: TransactionOptions): Promise<Address>,
   setCompleted(completed: UInt, options?: TransactionOptions): Promise<void>
 }
@@ -289,15 +320,15 @@ export interface MiniMeTokenInstance extends ContractInstance {
     amount: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
-  creationBlock(options?: TransactionOptions): Promise<UInt>,
-  totalSupply(options?: TransactionOptions): Promise<UInt>,
+  creationBlock(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  totalSupply(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   transferFrom(
     from: Address,
     to: Address,
     amount: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
-  decimals(options?: TransactionOptions): Promise<UInt>,
+  decimals(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   changeController(
     newController: Address,
     options?: TransactionOptions
@@ -306,7 +337,7 @@ export interface MiniMeTokenInstance extends ContractInstance {
     owner: Address,
     blockNumber: UInt,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   version(options?: TransactionOptions): Promise<string>,
   createCloneToken(
     cloneTokenName: string,
@@ -316,7 +347,10 @@ export interface MiniMeTokenInstance extends ContractInstance {
     transfersEnabled: boolean,
     options?: TransactionOptions
   ): Promise<Address>,
-  balanceOf(owner: Address, options?: TransactionOptions): Promise<UInt>,
+  balanceOf(
+    owner: Address,
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   parentToken(options?: TransactionOptions): Promise<Address>,
   generateTokens(
     owner: Address,
@@ -324,14 +358,19 @@ export interface MiniMeTokenInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<boolean>,
   symbol(options?: TransactionOptions): Promise<string>,
-  totalSupplyAt(blockNumber: UInt, options?: TransactionOptions): Promise<UInt>,
+  totalSupplyAt(
+    blockNumber: UInt,
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   transfer(
     to: Address,
     amount: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   transfersEnabled(options?: TransactionOptions): Promise<boolean>,
-  parentSnapShotBlock(options?: TransactionOptions): Promise<UInt>,
+  parentSnapShotBlock(
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   approveAndCall(
     spender: Address,
     amount: UInt,
@@ -347,7 +386,7 @@ export interface MiniMeTokenInstance extends ContractInstance {
     owner: Address,
     spender: Address,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
   tokenFactory(options?: TransactionOptions): Promise<Address>,
   enableTransfers(
@@ -373,7 +412,7 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
   tokenGrantsCount(
     holder: Address,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   name(options?: TransactionOptions): Promise<string>,
   approve(
     spender: Address,
@@ -383,9 +422,9 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
   spendableBalanceOf(
     holder: Address,
     options?: TransactionOptions
-  ): Promise<UInt>,
-  creationBlock(options?: TransactionOptions): Promise<UInt>,
-  totalSupply(options?: TransactionOptions): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
+  creationBlock(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  totalSupply(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   setCanCreateGrants(
     addr: Address,
     allowed: boolean,
@@ -401,8 +440,18 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     unnamed7: Address,
     unnamed8: UInt,
     options?: TransactionOptions
-  ): Promise<[Address, UInt, UInt, UInt, UInt, boolean, boolean]>,
-  decimals(options?: TransactionOptions): Promise<UInt>,
+  ): Promise<
+    [
+      Address,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      boolean,
+      boolean
+    ]
+  >,
+  decimals(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   changeController(
     newController: Address,
     options?: TransactionOptions
@@ -411,13 +460,24 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     owner: Address,
     blockNumber: UInt,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   version(options?: TransactionOptions): Promise<string>,
   tokenGrant(
     holder: Address,
     grantId: UInt,
     options?: TransactionOptions
-  ): Promise<[Address, UInt, UInt, UInt, UInt, UInt, boolean, boolean]>,
+  ): Promise<
+    [
+      Address,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      BigNumber.BigNumber,
+      boolean,
+      boolean
+    ]
+  >,
   createCloneToken(
     cloneTokenName: string,
     cloneDecimalUnits: UInt,
@@ -429,8 +489,11 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
   lastTokenIsTransferableDate(
     holder: Address,
     options?: TransactionOptions
-  ): Promise<UInt>,
-  balanceOf(owner: Address, options?: TransactionOptions): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
+  balanceOf(
+    owner: Address,
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   parentToken(options?: TransactionOptions): Promise<Address>,
   generateTokens(
     owner: Address,
@@ -448,14 +511,19 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     burnsOnRevoke: boolean,
     options?: TransactionOptions
   ): Promise<void>,
-  totalSupplyAt(blockNumber: UInt, options?: TransactionOptions): Promise<UInt>,
+  totalSupplyAt(
+    blockNumber: UInt,
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   transfer(
     to: Address,
     value: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   transfersEnabled(options?: TransactionOptions): Promise<boolean>,
-  parentSnapShotBlock(options?: TransactionOptions): Promise<UInt>,
+  parentSnapShotBlock(
+    options?: TransactionOptions
+  ): Promise<BigNumber.BigNumber>,
   approveAndCall(
     spender: Address,
     amount: UInt,
@@ -466,7 +534,7 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     holder: Address,
     time: UInt,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   destroyTokens(
     owner: Address,
     amount: UInt,
@@ -476,7 +544,7 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     owner: Address,
     spender: Address,
     options?: TransactionOptions
-  ): Promise<UInt>,
+  ): Promise<BigNumber.BigNumber>,
   claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
   tokenFactory(options?: TransactionOptions): Promise<Address>,
   revokeTokenGrant(
