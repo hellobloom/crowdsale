@@ -20,10 +20,10 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   BLT public token;
 
-  uint256 public constant TOTAL_SUPPLY = 15e25; // 150 million BLT with 18 decimals
-  uint256 private constant FOUNDER_SUPPLY = 3e25; // 20% supply
-  uint256 private constant FOUNDATION_SUPPLY = 3e25; // 20% supply
-  uint256 private constant ADVISOR_SUPPLY = 755e23; // 5% supply
+  uint256 public constant TOTAL_SUPPLY = 1.5e8 ether; // 150 million BLT with 18 decimals
+  uint256 private constant FOUNDER_SUPPLY = TOTAL_SUPPLY / 5; // 20% supply
+  uint256 private constant FOUNDATION_SUPPLY = TOTAL_SUPPLY / 5; // 20% supply
+  uint256 private constant ADVISOR_SUPPLY = TOTAL_SUPPLY / 20; // 5% supply
   uint256 private constant SALE_SUPPLY =
     TOTAL_SUPPLY - FOUNDATION_SUPPLY - FOUNDER_SUPPLY - ADVISOR_SUPPLY;
   uint256 private constant MAX_RAISE_IN_USD = 5e7; // Maximum raise of $50M
