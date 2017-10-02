@@ -153,12 +153,14 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     const { sale } = await createSaleWithToken(latestTime + 1, latestTime + 5);
 
+    await timer(2);
+
     await await sale.sendTransaction({
       value: 1000,
       from: purchaser
     }).should.be.fulfilled;
 
-    await timer(8);
+    await timer(10);
 
     await sale
       .sendTransaction({ value: 1000, from: purchaser })
