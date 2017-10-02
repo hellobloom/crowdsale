@@ -485,6 +485,29 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     spendableBalance.should.be.bignumber.equal(0);
   });
 
+  it("allows owner to revoke token grants", async () => {
+    const latestTime = latestBlockTime();
+
+    const { sale, token } = await createSaleWithToken(
+      latestTime + 50,
+      latestTime + 100
+    );
+
+    await token.changeVestingWhitelister(sale.address);
+
+    await sale.allocatePresaleTokens(
+      investor,
+      5000,
+      latestTime + 60,
+      latestTime + 80
+    );
+
+    await timer(70);
+    await sale.revokeGrant(investor, 0);
+
+    (await token.tokenGrantsCount(investor)).should.be.bignumber.equal(0);
+  });
+
   describe("changing controller after sale", () => {
     let sale: any;
     let token: any;

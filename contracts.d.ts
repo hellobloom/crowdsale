@@ -38,6 +38,11 @@ export interface BloomTokenSaleInstance extends ContractInstance {
   setToken(token: Address, options?: TransactionOptions): Promise<void>,
   rate(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   endTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  revokeGrant(
+    holder: Address,
+    grantId: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
   cap(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   unpause(options?: TransactionOptions): Promise<void>,
   weiRaised(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
