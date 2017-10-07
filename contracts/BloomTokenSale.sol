@@ -66,7 +66,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   // @dev low level token purchase function
   // @param _beneficiary address the tokens will be credited to
-  function proxyPayment(address _beneficiary) payable whenNotPaused returns (bool) {
+  function proxyPayment(address _beneficiary) payable whenNotPaused onlyAfterConfiguration returns (bool) {
     require(_beneficiary != 0x0);
     require(validPurchase());
 
