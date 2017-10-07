@@ -1,10 +1,30 @@
 # Bloom Token
 
+## Set up
+
+Install dependencies:
+
+```sh
+$ yarn
+$ ./node_modules/.bin/truffle install
+```
+
+Migrate:
+
+```sh
+# Start the testrpc
+$ ./node_modules/.bin/testrpc --gasLimit 100000000
+# In a separate terminal window
+$ ./node_modules/.bin/truffle migrate
+```
+
 ## Testing
 
 To run the test suite:
 
 ```sh
+# NOTE: Make sure you stop the testrpc started earlier,
+# otherwise you will get an error here. :)
 $ bin/test
 ```
 
