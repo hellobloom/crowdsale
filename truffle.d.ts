@@ -78,6 +78,7 @@ interface ConfigurableMockInstance extends ContractInstance, Ownable {
   count(...args: any[]): any;
   finishConfiguration(...args: any[]): any;
   increment(...args: any[]): any;
+  decrement(...args: any[]): any;
 }
 
 interface Artifacts {

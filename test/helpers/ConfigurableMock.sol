@@ -8,10 +8,14 @@ contract ConfigurableMock is Configurable {
   uint256 public count;
 
   function ConfigurableMock() {
-    count = 0;
+    count = 1;
   }
 
   function increment() external configuration {
     count++;
+  }
+
+  function decrement() external onlyAfterConfiguration {
+    count--;
   }
 }

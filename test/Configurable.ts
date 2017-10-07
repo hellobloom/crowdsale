@@ -19,12 +19,12 @@ contract("Configurable", function([_, _investor, _wallet, purchaser]) {
 
   it("allows the owner to configure the contract", async function() {
     const counter = await ConfigurableMock.new();
-    const count0 = await counter.count();
-    await counter.increment();
     const count1 = await counter.count();
+    await counter.increment();
+    const count2 = await counter.count();
 
-    count0.should.be.bignumber.equal(0);
     count1.should.be.bignumber.equal(1);
+    count2.should.be.bignumber.equal(2);
   });
 
   it("forbids non-owners from configuring the contract", async function() {
@@ -52,5 +52,17 @@ contract("Configurable", function([_, _investor, _wallet, purchaser]) {
     );
 
     should.exist(event);
+  });
+
+  it("only allows calling decrement after contract has been configured", async function() {
+    const counter = await ConfigurableMock.new();
+    const count1 = await counter.count();
+    await counter.decrement().should.be.rejectedWith("invalid opcode");
+    await counter.finishConfiguration();
+    await counter.decrement().should.be.fulfilled;
+    const count0 = await counter.count();
+
+    count1.should.be.bignumber.equal(1);
+    count0.should.be.bignumber.equal(0);
   });
 });

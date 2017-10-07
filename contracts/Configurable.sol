@@ -32,4 +32,9 @@ contract Configurable is Ownable {
     require(!configured);
     _;
   }
+
+  modifier onlyAfterConfiguration() {
+    require(configured);
+    _;
+  }
 }
