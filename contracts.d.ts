@@ -587,6 +587,35 @@ export interface PausableInstance extends ContractInstance {
   ): Promise<void>
 }
 
+export interface PlaceholderControllerInstance extends ContractInstance {
+  onTransfer(
+    unnamed9: Address,
+    unnamed10: Address,
+    unnamed11: UInt,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  owner(options?: TransactionOptions): Promise<Address>,
+  changeTokenController(
+    newController: Address,
+    options?: TransactionOptions
+  ): Promise<void>,
+  onApprove(
+    unnamed12: Address,
+    unnamed13: Address,
+    unnamed14: UInt,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  transferOwnership(
+    newOwner: Address,
+    options?: TransactionOptions
+  ): Promise<void>,
+  proxyPayment(
+    unnamed15: Address,
+    options?: TransactionOptions
+  ): Promise<boolean>,
+  token(options?: TransactionOptions): Promise<Address>
+}
+
 export interface SafeMathInstance extends ContractInstance {}
 
 export interface TokenControllerInstance extends ContractInstance {

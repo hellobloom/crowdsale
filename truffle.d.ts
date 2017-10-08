@@ -3,7 +3,8 @@ import {
   BLTInstance,
   BloomTokenSaleInstance,
   MiniMeTokenInstance,
-  MiniMeVestedTokenInstance
+  MiniMeVestedTokenInstance,
+  PlaceholderControllerInstance
 } from "./contracts";
 
 declare global {
@@ -84,6 +85,9 @@ interface ConfigurableMockInstance extends ContractInstance, Ownable {
 interface Artifacts {
   require(name: "MiniMeVestedToken"): Contract<MiniMeVestedTokenInstance>;
   require(name: "BloomTokenSale"): Contract<BloomTokenSaleInstance>;
+  require(
+    name: "PlaceholderController"
+  ): Contract<PlaceholderControllerInstance>;
   require(name: "BLT"): Contract<BLTInstance>;
   require(
     name: "./helpers/ConfigurableMock"
