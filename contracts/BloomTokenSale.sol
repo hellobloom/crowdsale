@@ -87,6 +87,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   function allocatePresaleTokens(address _receiver, uint256 _amount, uint64 cliffDate, uint64 vestingDate)
            onlyOwner
            whenNotPaused
+           beforeSale
            public {
 
     require(_amount <= 10 ** 25); // 10 million BLT. No presale partner will have more than this allocated. Prevent overflows.

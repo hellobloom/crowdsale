@@ -485,6 +485,35 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     spendableBalance.should.be.bignumber.equal(0);
   });
 
+  it("does not allow presale allocates after sale has started", async () => {
+    const latestTime = latestBlockTime();
+
+    const { sale, token } = await createSaleWithToken(
+      latestTime + 50,
+      latestTime + 100
+    );
+
+    await token.setCanCreateGrants(sale.address, true);
+
+    await sale.allocatePresaleTokens(
+      investor,
+      1,
+      latestBlockTime() + 10000,
+      latestBlockTime() + 100000
+    ).should.be.fulfilled;
+
+    await timer(50);
+
+    await sale
+      .allocatePresaleTokens(
+        investor,
+        1,
+        latestBlockTime() + 10000,
+        latestBlockTime() + 100000
+      )
+      .should.be.rejectedWith("invalid opcode");
+  });
+
   it("allows owner to revoke token grants", async () => {
     const latestTime = latestBlockTime();
 
