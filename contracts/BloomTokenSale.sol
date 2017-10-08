@@ -51,7 +51,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   }
 
   // @dev Allocate our initial token supply
-  function allocateSupply() configuration {
+  function allocateSupply() beforeSale configuration {
     token.generateTokens(address(this), TOTAL_SUPPLY);
   }
 
@@ -87,6 +87,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   function allocatePresaleTokens(address _receiver, uint256 _amount, uint64 cliffDate, uint64 vestingDate)
            onlyOwner
            whenNotPaused
+           beforeSale
            public {
 
     require(_amount <= 10 ** 25); // 10 million BLT. No presale partner will have more than this allocated. Prevent overflows.
@@ -130,6 +131,11 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   the initial configuration phase is finished.
   function validPurchase() internal constant returns (bool) {
     return super.validPurchase() && configured;
+  }
+
+  modifier beforeSale {
+    require(now < startTime);
+    _;
   }
 
   modifier whenFinalized {

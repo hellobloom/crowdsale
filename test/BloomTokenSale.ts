@@ -151,16 +151,16 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("rejects payments that come after the ending block", async function() {
     const latestTime = latestBlockTime();
 
-    const { sale } = await createSaleWithToken(latestTime + 1, latestTime + 5);
+    const { sale } = await createSaleWithToken(latestTime + 5, latestTime + 15);
 
-    await timer(2);
+    await timer(7);
 
     await await sale.sendTransaction({
       value: 1000,
       from: purchaser
     }).should.be.fulfilled;
 
-    await timer(10);
+    await timer(20);
 
     await sale
       .sendTransaction({ value: 1000, from: purchaser })
@@ -370,20 +370,20 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const latestTime = latestBlockTime();
 
     const sale = await BloomTokenSale.new(
-      latestTime + 5,
+      latestTime + 10,
       latestTime + 1000,
       new BigNumber(1000),
       wallet,
       new BigNumber("1000")
     );
 
-    timer(5);
-
     const token = await BLT.new();
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
     await advanceBlock();
+
+    await timer(10);
 
     await sale
       .sendTransaction({
@@ -483,6 +483,35 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     investorBalance.should.be.bignumber.equal(5000);
     spendableBalance.should.be.bignumber.equal(0);
+  });
+
+  it("does not allow presale allocates after sale has started", async () => {
+    const latestTime = latestBlockTime();
+
+    const { sale, token } = await createSaleWithToken(
+      latestTime + 50,
+      latestTime + 100
+    );
+
+    await token.setCanCreateGrants(sale.address, true);
+
+    await sale.allocatePresaleTokens(
+      investor,
+      1,
+      latestBlockTime() + 10000,
+      latestBlockTime() + 100000
+    ).should.be.fulfilled;
+
+    await timer(50);
+
+    await sale
+      .allocatePresaleTokens(
+        investor,
+        1,
+        latestBlockTime() + 10000,
+        latestBlockTime() + 100000
+      )
+      .should.be.rejectedWith("invalid opcode");
   });
 
   it("allows owner to revoke token grants", async () => {
