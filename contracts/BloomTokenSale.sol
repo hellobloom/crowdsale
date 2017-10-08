@@ -51,7 +51,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   }
 
   // @dev Allocate our initial token supply
-  function allocateSupply() configuration {
+  function allocateSupply() beforeSale configuration {
     token.generateTokens(address(this), TOTAL_SUPPLY);
   }
 
@@ -130,6 +130,11 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   the initial configuration phase is finished.
   function validPurchase() internal constant returns (bool) {
     return super.validPurchase() && configured;
+  }
+
+  modifier beforeSale {
+    require(now < startTime);
+    _;
   }
 
   modifier whenFinalized {

@@ -4,7 +4,7 @@ import '../../contracts/BloomTokenSale.sol';
 
 contract MockSale is BloomTokenSale {
   function MockSale() BloomTokenSale(
-    block.timestamp,
+    block.timestamp + 5,
     block.timestamp + 10,
     1000,
     address(this),

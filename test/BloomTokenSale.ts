@@ -151,16 +151,16 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("rejects payments that come after the ending block", async function() {
     const latestTime = latestBlockTime();
 
-    const { sale } = await createSaleWithToken(latestTime + 1, latestTime + 5);
+    const { sale } = await createSaleWithToken(latestTime + 5, latestTime + 15);
 
-    await timer(2);
+    await timer(7);
 
     await await sale.sendTransaction({
       value: 1000,
       from: purchaser
     }).should.be.fulfilled;
 
-    await timer(10);
+    await timer(20);
 
     await sale
       .sendTransaction({ value: 1000, from: purchaser })
@@ -370,20 +370,20 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const latestTime = latestBlockTime();
 
     const sale = await BloomTokenSale.new(
-      latestTime + 5,
+      latestTime + 10,
       latestTime + 1000,
       new BigNumber(1000),
       wallet,
       new BigNumber("1000")
     );
 
-    timer(5);
-
     const token = await BLT.new();
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
     await advanceBlock();
+
+    await timer(10);
 
     await sale
       .sendTransaction({
