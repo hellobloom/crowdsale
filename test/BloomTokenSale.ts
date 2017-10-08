@@ -531,7 +531,11 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestTime + 80
     );
 
-    await timer(70);
+    await timer(100);
+    await sale.finalize();
+
+    // Remove the controller so that we can work around the onTransfer check
+    await sale.changeTokenController("0x0");
     await sale.revokeGrant(investor, 0);
 
     (await token.tokenGrantsCount(investor)).should.be.bignumber.equal(0);
