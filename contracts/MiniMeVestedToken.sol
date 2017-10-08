@@ -163,10 +163,7 @@ contract MiniMeVestedToken is MiniMeToken {
     grants[_holder][_grantId] = grants[_holder][grants[_holder].length.sub(1)];
     grants[_holder].length -= 1;
 
-    updateValueAtNow(balances[receiver], balanceOf(receiver) + nonVested);
-    updateValueAtNow(balances[_holder], balanceOf(_holder) - nonVested);
-
-    Transfer(_holder, receiver, nonVested);
+    doTransfer(_holder, receiver, nonVested);
   }
 
   /**
