@@ -31,6 +31,6 @@ summarize() {
   echo
 }
 
-summarize Bloom
+summarize BLT
 summarize BloomTokenSale
 summarize MiniMeVestedToken
