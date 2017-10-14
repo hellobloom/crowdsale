@@ -146,15 +146,16 @@ contract MiniMeVestedToken is MiniMeToken {
   /**
    * @dev Revoke the grant of tokens of a specifed address.
    * @param _holder The address which will have its tokens revoked.
+   * @param _receiver Recipient of revoked tokens.
    * @param _grantId The id of the token grant.
    */
-  function revokeTokenGrant(address _holder, uint256 _grantId) onlyVestingWhitelister public {
+  function revokeTokenGrant(address _holder, address _receiver, uint256 _grantId) onlyVestingWhitelister public {
     TokenGrant storage grant = grants[_holder][_grantId];
 
     require(grant.revokable);
     require(grant.granter == msg.sender); // Only granter can revoke it
 
-    address receiver = grant.burnsOnRevoke ? 0xdead : msg.sender;
+    address receiver = grant.burnsOnRevoke ? 0xdead : _receiver;
 
     uint256 nonVested = nonVestedTokens(grant, uint64(now));
 

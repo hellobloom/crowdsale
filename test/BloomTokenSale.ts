@@ -527,18 +527,18 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale.allocatePresaleTokens(
       investor,
       5000,
-      latestTime + 60,
-      latestTime + 80
+      latestTime + 75,
+      latestTime + 125
     );
 
-    await timer(100);
-    await sale.finalize();
-
-    // Remove the controller so that we can work around the onTransfer check
-    await sale.changeTokenController("0x0");
+    const walletTokensBefore = await token.balanceOf(wallet);
+    await timer(101);
     await sale.revokeGrant(investor, 0);
 
-    (await token.tokenGrantsCount(investor)).should.be.bignumber.equal(0);
+    const walletTokensAfter = await token.balanceOf(wallet);
+    // Timing of revoke makes it tough to get the exact amount revoked
+    walletTokensBefore.should.be.bignumber.equal(0);
+    walletTokensAfter.should.be.bignumber.greaterThan(900);
   });
 
   describe("changing controller after sale", () => {
