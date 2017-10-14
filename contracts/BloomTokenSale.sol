@@ -98,7 +98,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   }
 
   function revokeGrant(address _holder, uint256 _grantId) onlyOwner public {
-    token.revokeTokenGrant(_holder, _grantId);
+    token.revokeTokenGrant(_holder, wallet, _grantId);
   }
 
   function changeTokenController(address _newController) onlyOwner whenFinalized public {
@@ -117,8 +117,8 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   transfers from the controller for now.
   //
   // @param _from address that wants to transfer their tokens
-  function onTransfer(address _from, address, uint) returns(bool) {
-    return _from == address(this);
+  function onTransfer(address _from, address _to, uint) returns(bool) {
+    return _from == address(this) || _to == address(wallet);
   }
 
   // @dev controller callback for approving token transfers. This feature

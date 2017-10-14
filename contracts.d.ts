@@ -48,8 +48,8 @@ export interface BloomTokenSaleInstance extends ContractInstance {
   weiRaised(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   onTransfer(
     from: Address,
-    unnamed0: Address,
-    unnamed1: UInt,
+    to: Address,
+    unnamed0: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   finalize(options?: TransactionOptions): Promise<void>,
@@ -78,9 +78,9 @@ export interface BloomTokenSaleInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<void>,
   onApprove(
+    unnamed1: Address,
     unnamed2: Address,
-    unnamed3: Address,
-    unnamed4: UInt,
+    unnamed3: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   allocateSupply(options?: TransactionOptions): Promise<void>,
@@ -125,8 +125,8 @@ export interface BLTInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<boolean>,
   grants(
-    unnamed5: Address,
-    unnamed6: UInt,
+    unnamed4: Address,
+    unnamed5: UInt,
     options?: TransactionOptions
   ): Promise<
     [
@@ -208,6 +208,12 @@ export interface BLTInstance extends ContractInstance {
     value: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
+  revokeTokenGrant(
+    holder: Address,
+    receiver: Address,
+    grantId: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
   transfersEnabled(options?: TransactionOptions): Promise<boolean>,
   parentSnapShotBlock(
     options?: TransactionOptions
@@ -235,11 +241,6 @@ export interface BLTInstance extends ContractInstance {
   ): Promise<BigNumber.BigNumber>,
   claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
   tokenFactory(options?: TransactionOptions): Promise<Address>,
-  revokeTokenGrant(
-    holder: Address,
-    grantId: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
   enableTransfers(
     transfersEnabled: boolean,
     options?: TransactionOptions
@@ -442,8 +443,8 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<boolean>,
   grants(
-    unnamed7: Address,
-    unnamed8: UInt,
+    unnamed6: Address,
+    unnamed7: UInt,
     options?: TransactionOptions
   ): Promise<
     [
@@ -525,6 +526,12 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     value: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
+  revokeTokenGrant(
+    holder: Address,
+    receiver: Address,
+    grantId: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
   transfersEnabled(options?: TransactionOptions): Promise<boolean>,
   parentSnapShotBlock(
     options?: TransactionOptions
@@ -552,11 +559,6 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
   ): Promise<BigNumber.BigNumber>,
   claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
   tokenFactory(options?: TransactionOptions): Promise<Address>,
-  revokeTokenGrant(
-    holder: Address,
-    grantId: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
   enableTransfers(
     transfersEnabled: boolean,
     options?: TransactionOptions
@@ -589,9 +591,9 @@ export interface PausableInstance extends ContractInstance {
 
 export interface PlaceholderControllerInstance extends ContractInstance {
   onTransfer(
+    unnamed8: Address,
     unnamed9: Address,
-    unnamed10: Address,
-    unnamed11: UInt,
+    unnamed10: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   owner(options?: TransactionOptions): Promise<Address>,
@@ -600,9 +602,9 @@ export interface PlaceholderControllerInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<void>,
   onApprove(
+    unnamed11: Address,
     unnamed12: Address,
-    unnamed13: Address,
-    unnamed14: UInt,
+    unnamed13: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   transferOwnership(
@@ -610,7 +612,7 @@ export interface PlaceholderControllerInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<void>,
   proxyPayment(
-    unnamed15: Address,
+    unnamed14: Address,
     options?: TransactionOptions
   ): Promise<boolean>,
   token(options?: TransactionOptions): Promise<Address>

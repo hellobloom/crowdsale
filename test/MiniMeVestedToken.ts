@@ -163,7 +163,7 @@ contract("MiniMeVestedToken", function(
 
     it("cannot be revoked", async () => {
       await token
-        .revokeTokenGrant(receiver, 0, { from: granter })
+        .revokeTokenGrant(receiver, user, 0, { from: granter })
         .should.be.rejectedWith("invalid opcode");
     });
 
@@ -234,7 +234,7 @@ contract("MiniMeVestedToken", function(
 
       await timer(15000);
 
-      await token.revokeTokenGrant(receiver, 0);
+      await token.revokeTokenGrant(receiver, granter, 0);
 
       const granterBalance = await token.spendableBalanceOf(granter);
       const receiverBalance = await token.spendableBalanceOf(receiver);
