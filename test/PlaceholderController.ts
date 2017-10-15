@@ -40,37 +40,40 @@ contract("PlaceholderController", function([_, investor, wallet, recipient]) {
     await advanceBlock();
   });
 
-  it("allows transfers when the placeholder is the controller", async function() {
-    const latestTime = latestBlockTime();
+  it(
+    "allows transfers when the placeholder is the controller",
+    async function() {
+      const latestTime = latestBlockTime();
 
-    const sale = await BloomTokenSale.new(
-      latestTime + 5,
-      latestTime + 20,
-      new BigNumber(1000),
-      wallet,
-      1000
-    );
+      const sale = await BloomTokenSale.new(
+        latestTime + 5,
+        latestTime + 20,
+        new BigNumber(1000),
+        wallet,
+        web3.eth.getBalance(wallet).add(1000)
+      );
 
-    const token = await BLT.new();
-    const placeholder = await PlaceholderController.new(token.address);
-    await token.changeController(sale.address);
-    await sale.setToken(token.address);
-    await sale.allocateSupply();
-    await sale.finishConfiguration();
+      const token = await BLT.new();
+      const placeholder = await PlaceholderController.new(token.address);
+      await token.changeController(sale.address);
+      await sale.setToken(token.address);
+      await sale.allocateSupply();
+      await sale.finishConfiguration();
 
-    await timer(5);
+      await timer(5);
 
-    await sale.sendTransaction({ value: 1000, from: investor });
-    await token
-      .transfer(recipient, 500, { from: investor })
-      .should.be.rejectedWith("invalid opcode");
+      await sale.sendTransaction({ value: 1000, from: investor });
+      await token
+        .transfer(recipient, 500, { from: investor })
+        .should.be.rejectedWith("invalid opcode");
 
-    await timer(25);
+      await timer(25);
 
-    await sale.finalize();
-    await sale.changeTokenController(placeholder.address);
-    await token.transfer(recipient, 500, {
-      from: investor
-    }).should.be.fulfilled;
-  });
+      await sale.finalize();
+      await sale.changeTokenController(placeholder.address);
+      await token.transfer(recipient, 500, {
+        from: investor
+      }).should.be.fulfilled;
+    }
+  );
 });
