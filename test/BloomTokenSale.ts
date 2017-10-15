@@ -86,7 +86,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     controllerBalanceBefore.should.be.bignumber.equal(0);
 
     supplyAfter.should.be.bignumber.equal("15e25");
-    controllerBalanceAfter.should.be.bignumber.equal("15e25");
+    controllerBalanceAfter.should.be.bignumber.equal("11.25e25");
   });
 
   it("only allows the owner to allocate supply", async function() {
@@ -461,31 +461,28 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     investorBalance.should.be.bignumber.equal("1e18");
   });
 
-  it(
-    "supports syncing weiRaised with wallet for presale purchases",
-    async function() {
-      const sale = await BloomTokenSale.new(
-        latestBlockTime() + 5,
-        latestBlockTime() + 10,
-        new BigNumber(1000),
-        wallet,
-        1
-      );
+  it("supports syncing weiRaised with wallet for presale purchases", async function() {
+    const sale = await BloomTokenSale.new(
+      latestBlockTime() + 5,
+      latestBlockTime() + 10,
+      new BigNumber(1000),
+      wallet,
+      1
+    );
 
-      const token = await BLT.new();
-      await token.changeController(sale.address);
-      await sale.setToken(token.address);
-      await sale.setEtherPriceInCents(40000);
-      await sale.allocateSupply();
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.setEtherPriceInCents(40000);
+    await sale.allocateSupply();
 
-      const beforeSync = await sale.weiRaised();
-      await sale.finishConfiguration();
-      const afterSync = await sale.weiRaised();
+    const beforeSync = await sale.weiRaised();
+    await sale.finishConfiguration();
+    const afterSync = await sale.weiRaised();
 
-      beforeSync.should.be.bignumber.equal(0);
-      afterSync.should.be.bignumber.equal(web3.eth.getBalance(wallet));
-    }
-  );
+    beforeSync.should.be.bignumber.equal(0);
+    afterSync.should.be.bignumber.equal(web3.eth.getBalance(wallet));
+  });
 
   it("allocates vested tokens for presale purchases", async () => {
     const latestTime = latestBlockTime();
@@ -563,8 +560,10 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     const walletTokensAfter = await token.balanceOf(wallet);
     // Timing of revoke makes it tough to get the exact amount revoked
-    walletTokensBefore.should.be.bignumber.equal(0);
-    walletTokensAfter.should.be.bignumber.greaterThan(900);
+    walletTokensBefore.should.be.bignumber.equal("3.75e25");
+    walletTokensAfter
+      .sub(walletTokensBefore)
+      .should.be.bignumber.greaterThan(900);
   });
 
   describe("changing controller after sale", () => {
