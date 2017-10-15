@@ -24,8 +24,10 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   uint256 private constant FOUNDER_SUPPLY = TOTAL_SUPPLY / 5; // 20% supply
   uint256 private constant FOUNDATION_SUPPLY = TOTAL_SUPPLY / 5; // 20% supply
   uint256 private constant ADVISOR_SUPPLY = TOTAL_SUPPLY / 20; // 5% supply
-  uint256 private constant SALE_SUPPLY =
-    TOTAL_SUPPLY - FOUNDATION_SUPPLY - FOUNDER_SUPPLY - ADVISOR_SUPPLY;
+  uint256 private constant PARTNERSHIP_SUPPLY = TOTAL_SUPPLY / 20; // 5% supply
+  uint256 private constant CONTROLLER_ALLOCATION =
+    TOTAL_SUPPLY - FOUNDATION_SUPPLY - PARTNERSHIP_SUPPLY; // 75%
+  uint256 private constant WALLET_ALLOCATION = TOTAL_SUPPLY - CONTROLLER_ALLOCATION; // 25%
   uint256 private constant MAX_RAISE_IN_USD = 5e7; // Maximum raise of $50M
   uint256 private constant TOKEN_PRICE_IN_CENTS = 61; // Target token price
 
@@ -52,7 +54,8 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   // @dev Allocate our initial token supply
   function allocateSupply() beforeSale configuration {
-    token.generateTokens(address(this), TOTAL_SUPPLY);
+    token.generateTokens(address(this), CONTROLLER_ALLOCATION);
+    token.generateTokens(wallet, WALLET_ALLOCATION);
   }
 
   // @dev Configure the ether price which sets our cap and rate.
