@@ -346,7 +346,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const { sale } = await createSaleWithToken(
       latestTime + 5,
       latestTime + 1000,
-      new BigNumber("1000")
+      web3.eth.getBalance(wallet).add(new BigNumber("1000"))
     );
 
     timer(5);
@@ -460,6 +460,32 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const investorBalance = await token.balanceOf(investor);
     investorBalance.should.be.bignumber.equal("1e18");
   });
+
+  it(
+    "supports syncing weiRaised with wallet for presale purchases",
+    async function() {
+      const sale = await BloomTokenSale.new(
+        latestBlockTime() + 5,
+        latestBlockTime() + 10,
+        new BigNumber(1000),
+        wallet,
+        1
+      );
+
+      const token = await BLT.new();
+      await token.changeController(sale.address);
+      await sale.setToken(token.address);
+      await sale.setEtherPriceInCents(40000);
+      await sale.allocateSupply();
+
+      const beforeSync = await sale.weiRaised();
+      await sale.finishConfiguration();
+      const afterSync = await sale.weiRaised();
+
+      beforeSync.should.be.bignumber.equal(0);
+      afterSync.should.be.bignumber.equal(web3.eth.getBalance(wallet));
+    }
+  );
 
   it("allocates vested tokens for presale purchases", async () => {
     const latestTime = latestBlockTime();

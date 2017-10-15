@@ -8,8 +8,6 @@ const ropstenProvider = new HDWalletProvider(
   "https://ropsten.infura.io/"
 );
 
-global.ropstenProvider = ropstenProvider;
-
 require("babel-register");
 require("babel-polyfill");
 

@@ -97,6 +97,15 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     NewPresaleAllocation(_receiver, _amount);
   }
 
+  function finishConfiguration() configuration returns (bool) {
+    syncPresaleWeiRaised();
+    super.finishConfiguration();
+  }
+
+  function syncPresaleWeiRaised() internal {
+    weiRaised = wallet.balance;
+  }
+
   function revokeGrant(address _holder, uint256 _grantId) onlyOwner public {
     token.revokeTokenGrant(_holder, wallet, _grantId);
   }
