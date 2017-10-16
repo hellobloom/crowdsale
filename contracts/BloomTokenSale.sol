@@ -35,6 +35,8 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   uint256 private constant WEI_PER_ETHER_TWO_DECIMALS = 1e20;
   uint256 private constant TOKEN_UNITS_PER_TOKEN = 1e18; // Decimal units per BLT
 
+  uint256 public advisorPool = ADVISOR_SUPPLY;
+
   event NewPresaleAllocation(address indexed holder, uint256 bltAmount);
 
   function BloomTokenSale(
@@ -87,6 +89,15 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     return true;
   }
 
+  function allocateAdvisorTokens(address _receiver, uint256 _amount, uint64 _cliffDate, uint64 _vestingDate)
+           configuration
+           beforeSale
+           public {
+    require(_amount <= advisorPool);
+    advisorPool = advisorPool.sub(_amount);
+    allocatePresaleTokens(_receiver, _amount, _cliffDate, _vestingDate);
+  }
+
   function allocatePresaleTokens(address _receiver, uint256 _amount, uint64 cliffDate, uint64 vestingDate)
            onlyOwner
            whenNotPaused
@@ -102,11 +113,19 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   function finishConfiguration() configuration returns (bool) {
     syncPresaleWeiRaised();
+    transferUnallocatedAdvisorTokens();
     super.finishConfiguration();
   }
 
   function syncPresaleWeiRaised() internal {
     weiRaised = wallet.balance;
+  }
+
+  function transferUnallocatedAdvisorTokens() internal {
+    uint256 _unallocatedTokens = advisorPool;
+    // Advisor pool will not be used again but we zero it out anyways for the sake of book keeping
+    advisorPool = 0;
+    token.transferFrom(address(this), wallet, _unallocatedTokens);
   }
 
   function revokeGrant(address _holder, uint256 _grantId) onlyOwner public {

@@ -35,6 +35,7 @@ export interface ApproveAndCallFallBackInstance extends ContractInstance {
 }
 
 export interface BloomTokenSaleInstance extends ContractInstance {
+  advisorPool(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   setToken(token: Address, options?: TransactionOptions): Promise<void>,
   rate(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   endTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
@@ -84,6 +85,13 @@ export interface BloomTokenSaleInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<boolean>,
   allocateSupply(options?: TransactionOptions): Promise<void>,
+  allocateAdvisorTokens(
+    receiver: Address,
+    amount: UInt,
+    cliffDate: UInt,
+    vestingDate: UInt,
+    options?: TransactionOptions
+  ): Promise<void>,
   hasEnded(options?: TransactionOptions): Promise<boolean>,
   transferOwnership(
     newOwner: Address,

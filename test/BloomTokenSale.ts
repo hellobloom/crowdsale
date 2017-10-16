@@ -560,10 +560,117 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     const walletTokensAfter = await token.balanceOf(wallet);
     // Timing of revoke makes it tough to get the exact amount revoked
-    walletTokensBefore.should.be.bignumber.equal("3.75e25");
+    walletTokensBefore.should.be.bignumber.equal("4.5e25");
     walletTokensAfter
       .sub(walletTokensBefore)
       .should.be.bignumber.greaterThan(900);
+  });
+
+  describe("allocating tokens to advisors", async () => {
+    let sale: any;
+    let token: any;
+
+    beforeEach(async () => {
+      sale = await BloomTokenSale.new(
+        latestBlockTime() + 5,
+        latestBlockTime() + 10,
+        new BigNumber(1000),
+        wallet,
+        new BigNumber("1.6e23")
+      );
+
+      token = await BLT.new();
+      await token.changeController(sale.address);
+      await sale.setToken(token.address);
+      await sale.setEtherPriceInCents(40000);
+      await sale.allocateSupply();
+      await token.setCanCreateGrants(sale.address, true);
+    });
+
+    it("updates the advisorPool when granting advisor tokens", async () => {
+      const advisorPoolBefore = await sale.advisorPool();
+
+      await sale.allocateAdvisorTokens(
+        investor,
+        new BigNumber("1e24"),
+        latestBlockTime() + 10000,
+        latestBlockTime() + 100000
+      );
+
+      const advisorPoolAfter = await sale.advisorPool();
+      const investorBalance = await token.balanceOf(investor);
+
+      advisorPoolBefore.should.be.bignumber.equal("7.5e24");
+      investorBalance.should.be.bignumber.equal("1e24");
+      advisorPoolAfter.should.be.bignumber.equal("6.5e24");
+    });
+
+    it("rejects advisor allocations once the pool has been emptied", async () => {
+      await sale.allocateAdvisorTokens(
+        investor,
+        new BigNumber("3.75e24"),
+        latestBlockTime() + 10000,
+        latestBlockTime() + 100000
+      ).should.be.fulfilled;
+
+      await sale.allocateAdvisorTokens(
+        investor,
+        new BigNumber("3.75e24"),
+        latestBlockTime() + 10000,
+        latestBlockTime() + 100000
+      ).should.be.fulfilled;
+
+      await sale
+        .allocateAdvisorTokens(
+          investor,
+          1,
+          latestBlockTime() + 10000,
+          latestBlockTime() + 100000
+        )
+        .should.be.rejectedWith("invalid opcode");
+    });
+
+    it("rejects advisor allocations if the pool does not have enough funds left", async () => {
+      await sale.allocateAdvisorTokens(
+        investor,
+        new BigNumber("3e24"),
+        latestBlockTime() + 10000,
+        latestBlockTime() + 100000
+      ).should.be.fulfilled;
+
+      await sale.allocateAdvisorTokens(
+        investor,
+        new BigNumber("3e24"),
+        latestBlockTime() + 10000,
+        latestBlockTime() + 100000
+      ).should.be.fulfilled;
+
+      await sale
+        .allocateAdvisorTokens(
+          investor,
+          new BigNumber("3e24"),
+          latestBlockTime() + 10000,
+          latestBlockTime() + 100000
+        )
+        .should.be.rejectedWith("invalid opcode");
+    });
+
+    it("transfers unallocated advisor tokens to the wallet", async () => {
+      await sale.allocateAdvisorTokens(
+        investor,
+        new BigNumber("3e24"),
+        latestBlockTime() + 10000,
+        latestBlockTime() + 100000
+      );
+
+      const walletTokensBefore = await token.balanceOf(wallet);
+      await sale.finishConfiguration();
+      const walletTokensAfter = await token.balanceOf(wallet);
+
+      walletTokensAfter
+        .sub(walletTokensBefore)
+        .should.be.bignumber.equal("4.5e24");
+    });
   });
 
   describe("changing controller after sale", () => {
