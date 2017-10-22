@@ -63,12 +63,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   // @dev Link the token to the Crowdsale
   // @param _token address of the deployed token
-  function setToken(address _token) presaleOnly {
+  function setToken(address _token) presaleOnly public {
     token = BLT(_token);
   }
 
   // @dev Allocate our initial token supply
-  function allocateSupply() presaleOnly {
+  function allocateSupply() presaleOnly public {
     require(token.totalSupply() == 0);
     token.generateTokens(address(this), CONTROLLER_ALLOCATION);
     token.generateTokens(wallet, WALLET_ALLOCATION);
@@ -112,7 +112,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   4. Sets the `rate` for the sale now based on the remaining tokens and cap
   //
   // @param _cents The number of cents in USD to purchase 1 ETH
-  function finishPresale(uint256 _cents) presaleOnly returns (bool) {
+  function finishPresale(uint256 _cents) presaleOnly public returns (bool) {
     setCapFromEtherPrice(_cents);
     syncPresaleWeiRaised();
     transferUnallocatedAdvisorTokens();
@@ -130,7 +130,11 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   // @dev low level token purchase function
   // @param _beneficiary address the tokens will be credited to
-  function proxyPayment(address _beneficiary) payable whenNotPaused onlyAfterConfiguration returns (bool) {
+  function proxyPayment(address _beneficiary)
+    payable
+    whenNotPaused
+    onlyAfterConfiguration
+    public returns (bool) {
     require(_beneficiary != 0x0);
     require(validPurchase());
 
@@ -152,13 +156,13 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   transfers from the controller for now.
   //
   // @param _from address that wants to transfer their tokens
-  function onTransfer(address _from, address _to, uint) returns (bool) {
+  function onTransfer(address _from, address _to, uint) public returns (bool) {
     return _from == address(this) || _to == address(wallet);
   }
 
   // @dev controller callback for approving token transfers. This feature
   //   is disabled during the crowdsale for the sake of simplicity
-  function onApprove(address, address, uint) returns (bool) {
+  function onApprove(address, address, uint) public returns (bool) {
     return false;
   }
 
@@ -215,11 +219,11 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   // @dev validate purchases. Delegates to super method and also requires that
   //   the initial configuration phase is finished.
-  function validPurchase() internal constant returns (bool) {
+  function validPurchase() constant internal returns (bool) {
     return super.validPurchase() && configured;
   }
 
-  function inPresalePhase() internal beforeSale configuration returns (bool) {
+  function inPresalePhase() constant beforeSale configuration internal returns (bool) {
     return true;
   }
 
