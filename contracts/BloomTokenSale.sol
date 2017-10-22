@@ -13,7 +13,11 @@ import "./BLT.sol";
  * @title BloomTokenSale
  * @dev Contract for controlling the sale of Bloom tokens. This contract composes our modified
  *   `Crowdsale` and `CappedCrowdsale` contracts, implemented the MiniMeToken controller interface,
- *   supports owner pausing, and has initial owner-only configuration setup.
+ *   supports owner pausing, and has initial owner-only configuration setup. The constructor requires
+ *   a `_cap` and `_rate` that are passed to `Crowdsale` and `CappedCrowdsale` but these values aren't
+ *   actually used. When `finalizePresale` is called a ETH/USD price is specified in cents. This price
+ *   and the remaining unallocated tokens are used to determine the `rate` and `cap`. These unused
+ *   constructor variables are awkward but intentional, see hellobloom/crowdsale#86 for more details.
  */
 contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, Configurable, FinalizableCrowdsale {
   using SafeMath for uint256;
@@ -80,6 +84,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     return true;
   }
 
+  // @dev Explicitly allocate tokens from the advisor pool, updating how much is left in the pool.
+  //
+  // @param _receiver Recipient of grant
+  // @param _amount Total BLT units allocated
+  // @param _cliffDate Vesting cliff
+  // @param _vestingDate Date that the vesting finishes
   function allocateAdvisorTokens(address _receiver, uint256 _amount, uint64 _cliffDate, uint64 _vestingDate)
            configuration
            beforeSale
@@ -89,6 +99,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     allocatePresaleTokens(_receiver, _amount, _cliffDate, _vestingDate);
   }
 
+  // @dev Allocate a normal presale grant. Does not necessarily come from a limited pool like the advisor tokens.
+  //
+  // @param _receiver Recipient of grant
+  // @param _amount Total BLT units allocated
+  // @param _cliffDate Vesting cliff
+  // @param _vestingDate Date that the vesting finishes
   function allocatePresaleTokens(address _receiver, uint256 _amount, uint64 cliffDate, uint64 vestingDate)
            onlyOwner
            whenNotPaused
@@ -107,6 +123,8 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   2. Updates the `weiRaised` to the balance of our wallet
   //   3. Takes the unallocated portion of the advisor pool and transfers to the wallet
   //   4. Sets the `rate` for the sale now based on the remaining tokens and cap
+  //
+  // @param _cents The number of cents in USD to purchase 1 ETH
   function finishPresale(uint256 _cents) configuration returns (bool) {
     setCapFromEtherPrice(_cents);
     syncPresaleWeiRaised();
@@ -123,10 +141,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     cap = MAX_RAISE_IN_USD.mul(weiPerDollar);
   }
 
+  // @dev Set the `weiRaised` for this contract to the balance of the sale wallet
   function syncPresaleWeiRaised() internal {
     weiRaised = wallet.balance;
   }
 
+  // @dev Transfer unallocated advisor tokens to our wallet. Lets us sell any leftovers
   function transferUnallocatedAdvisorTokens() internal {
     uint256 _unallocatedTokens = advisorPool;
     // Advisor pool will not be used again but we zero it out anyways for the sake of book keeping
@@ -134,16 +154,24 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     token.transferFrom(address(this), wallet, _unallocatedTokens);
   }
 
+  // @dev Set the `rate` based on our remaining token supply and how much we still need to raise
   function updateRateBasedOnFundsAndSupply() internal {
     uint256 _unraisedWei = cap - weiRaised;
     uint256 _tokensForSale = token.balanceOf(address(this));
     rate = _tokensForSale.mul(1e18).div(_unraisedWei);
   }
 
+  // @dev Revoke a token grant, transfering the unvested tokens to our sale wallet
+  //
+  // @param _holder Owner of the vesting grant that is being revoked
+  // @param _grantId ID of the grant being revoked
   function revokeGrant(address _holder, uint256 _grantId) onlyOwner public {
     token.revokeTokenGrant(_holder, wallet, _grantId);
   }
 
+  // @dev Change the token controller once the sale is over
+  //
+  // @param _newController Address of new token controller
   function changeTokenController(address _newController) onlyOwner whenFinalized public {
     token.changeController(_newController);
   }
@@ -156,6 +184,9 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     token.transferFrom(address(this), _beneficiary, tokensFor(_weiAmount));
   }
 
+  // @dev Compute number of token units a given amount of wei gets
+  //
+  // @param _weiAmount Amount of wei to convert
   function tokensFor(uint256 _weiAmount) internal returns (uint256) {
     return _weiAmount.mul(rate).div(1e18);
   }
