@@ -114,6 +114,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   function finishConfiguration() configuration returns (bool) {
     syncPresaleWeiRaised();
     transferUnallocatedAdvisorTokens();
+    updateRateBasedOnFundsAndSupply();
     super.finishConfiguration();
   }
 
@@ -126,6 +127,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     // Advisor pool will not be used again but we zero it out anyways for the sake of book keeping
     advisorPool = 0;
     token.transferFrom(address(this), wallet, _unallocatedTokens);
+  }
+
+  function updateRateBasedOnFundsAndSupply() internal {
+    uint256 _unraisedWei = cap - weiRaised;
+    uint256 _tokensForSale = token.balanceOf(address(this));
+    rate = _tokensForSale.mul(1e18).div(_unraisedWei);
   }
 
   function revokeGrant(address _holder, uint256 _grantId) onlyOwner public {
@@ -141,7 +148,11 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @param _beneficiary recipient of tokens
   // @param _weiAmount wei transfered to crowdsale
   function allocateTokens(address _beneficiary, uint256 _weiAmount) private {
-    token.transferFrom(address(this), _beneficiary, _weiAmount.mul(TOKEN_UNITS_PER_TOKEN).div(rate));
+    token.transferFrom(address(this), _beneficiary, tokensFor(_weiAmount));
+  }
+
+  function tokensFor(uint256 _weiAmount) internal returns (uint256) {
+    return _weiAmount.mul(rate).div(1e18);
   }
 
   // @dev controller callback for approving token transfers. Only supports

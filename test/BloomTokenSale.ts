@@ -33,6 +33,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
+    // TODO: Shouldn't be possible to finish config without setting price
     await sale.finishConfiguration();
 
     return { sale, token };
@@ -187,7 +188,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
 
-    purchaserTokenAllocationAfter.should.be.bignumber.equal(5000000000000000);
+    purchaserTokenAllocationAfter.should.be.bignumber.equal(3151);
     walletBalanceAfter.should.be.bignumber.equal(walletBalanceBefore.plus(5));
   });
 
@@ -212,7 +213,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
     purchaserTokenAllocationAfter.should.be.bignumber.equal(0);
     investorTokenAllocationBefore.should.be.bignumber.equal(0);
-    investorTokenAllocationAfter.should.be.bignumber.equal(5000000000000000);
+    investorTokenAllocationAfter.should.be.bignumber.equal(3151);
   });
 
   it("rejects proxy payments for a null address", async function() {
@@ -458,7 +459,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     });
 
     const investorBalance = await token.balanceOf(investor);
-    investorBalance.should.be.bignumber.equal("1e18");
+    investorBalance.should.be.bignumber.equal("1282025620496397117");
   });
 
   it("supports syncing weiRaised with wallet for presale purchases", async function() {
