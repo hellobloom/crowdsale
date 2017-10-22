@@ -89,6 +89,19 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     controllerBalanceAfter.should.be.bignumber.equal("11.25e25");
   });
 
+  it("does not allow setting the token during the sale", async () => {
+    const { sale } = await createSaleWithToken(
+      // The early payment attempt is the eighth transaction in this test
+      // so we start the sale nine blocks ahead
+      latestBlockTime() + 5,
+      latestBlockTime() + 100
+    );
+
+    await timer(10);
+
+    sale.setToken("0x0").should.be.rejectedWith("invalid opcode");
+  });
+
   it("only allows the owner to allocate supply", async function() {
     const sale = await BloomTokenSale.new(
       latestBlockTime() + 5,
@@ -472,10 +485,18 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("allocates vested tokens for presale purchases", async () => {
     const latestTime = latestBlockTime();
 
-    const { sale, token } = await createSaleWithToken(
+    const sale = await BloomTokenSale.new(
       latestTime + 50,
-      latestTime + 100
+      latestTime + 100,
+      new BigNumber(1000),
+      wallet,
+      1234
     );
+
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
 
     await token.setCanCreateGrants(sale.address, true);
 
@@ -496,10 +517,18 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("does not allow presale allocates after sale has started", async () => {
     const latestTime = latestBlockTime();
 
-    const { sale, token } = await createSaleWithToken(
+    const sale = await BloomTokenSale.new(
       latestTime + 50,
-      latestTime + 100
+      latestTime + 100,
+      new BigNumber(1000),
+      wallet,
+      1234
     );
+
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
 
     await token.setCanCreateGrants(sale.address, true);
 
@@ -525,10 +554,18 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("allows owner to revoke token grants", async () => {
     const latestTime = latestBlockTime();
 
-    const { sale, token } = await createSaleWithToken(
+    const sale = await BloomTokenSale.new(
       latestTime + 50,
-      latestTime + 100
+      latestTime + 100,
+      new BigNumber(1000),
+      wallet,
+      1234
     );
+
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
 
     await token.changeVestingWhitelister(sale.address);
 
@@ -538,6 +575,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestTime + 75,
       latestTime + 125
     );
+
+    await sale.finishPresale(30000);
 
     const walletTokensBefore = await token.balanceOf(wallet);
     await timer(101);
