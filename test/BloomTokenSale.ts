@@ -89,6 +89,19 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     controllerBalanceAfter.should.be.bignumber.equal("11.25e25");
   });
 
+  it("does not allow setting the token during the sale", async () => {
+    const { sale } = await createSaleWithToken(
+      // The early payment attempt is the eighth transaction in this test
+      // so we start the sale nine blocks ahead
+      latestBlockTime() + 5,
+      latestBlockTime() + 100
+    );
+
+    await timer(10);
+
+    sale.setToken("0x0").should.be.rejectedWith("invalid opcode");
+  });
+
   it("only allows the owner to allocate supply", async function() {
     const sale = await BloomTokenSale.new(
       latestBlockTime() + 5,

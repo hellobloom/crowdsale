@@ -21,12 +21,11 @@ import "./BLT.sol";
  *
  *   The public functions within this contract are organized by their phase of the contract:
  *
- *     1. Deployment and setup (setting the token, allocating supply)
- *     2. Presale (allocating token grants, finalizing settings to get ready for sale)
- *     3. Public sale (purchasing tokens from this contract, approving transfers)
- *     4. Finalization (changing to our placeholder controller)
+ *     1. Setup + Presale (setting token, supply, grants, finalizing settings to get ready for sale)
+ *     2. Public sale (purchasing tokens from this contract, approving transfers)
+ *     3. Finalization (changing to our placeholder controller)
  *
- *   This contract is only available to the public for phase 3. The `Configurable` and `FinaliableCrowdsale`
+ *   This contract is only available to the public for phase 2. The `Configurable` and `FinaliableCrowdsale`
  *   contracts enforce the invariant that we can only advance phases (e.g. from presale to public sale) but
  *   we can never go back and we can't call functions from previous phases once we have left them.
  */
@@ -65,12 +64,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   // @dev Link the token to the Crowdsale
   // @param _token address of the deployed token
-  function setToken(address _token) beforeSale configuration {
+  function setToken(address _token) presaleOnly {
     token = BLT(_token);
   }
 
   // @dev Allocate our initial token supply
-  function allocateSupply() beforeSale configuration {
+  function allocateSupply() presaleOnly {
     require(token.totalSupply() == 0);
     token.generateTokens(address(this), CONTROLLER_ALLOCATION);
     token.generateTokens(wallet, WALLET_ALLOCATION);
@@ -83,8 +82,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @param _cliffDate Vesting cliff
   // @param _vestingDate Date that the vesting finishes
   function allocateAdvisorTokens(address _receiver, uint256 _amount, uint64 _cliffDate, uint64 _vestingDate)
-           beforeSale
-           configuration
+           presaleOnly
            public {
     require(_amount <= advisorPool);
     advisorPool = advisorPool.sub(_amount);
@@ -98,8 +96,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @param _cliffDate Vesting cliff
   // @param _vestingDate Date that the vesting finishes
   function allocatePresaleTokens(address _receiver, uint256 _amount, uint64 cliffDate, uint64 vestingDate)
-           beforeSale
-           configuration
+           presaleOnly
            public {
 
     require(_amount <= 10 ** 25); // 10 million BLT. No presale partner will have more than this allocated. Prevent overflows.
@@ -116,7 +113,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   4. Sets the `rate` for the sale now based on the remaining tokens and cap
   //
   // @param _cents The number of cents in USD to purchase 1 ETH
-  function finishPresale(uint256 _cents) beforeSale configuration returns (bool) {
+  function finishPresale(uint256 _cents) presaleOnly returns (bool) {
     setCapFromEtherPrice(_cents);
     syncPresaleWeiRaised();
     transferUnallocatedAdvisorTokens();
@@ -221,6 +218,15 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   the initial configuration phase is finished.
   function validPurchase() internal constant returns (bool) {
     return super.validPurchase() && configured;
+  }
+
+  function inPresalePhase() internal beforeSale configuration returns (bool) {
+    return true;
+  }
+
+  modifier presaleOnly() {
+    require(inPresalePhase());
+    _;
   }
 
   modifier beforeSale {
