@@ -71,6 +71,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   // @dev Allocate our initial token supply
   function allocateSupply() beforeSale configuration {
+    require(token.totalSupply() == 0);
     token.generateTokens(address(this), CONTROLLER_ALLOCATION);
     token.generateTokens(wallet, WALLET_ALLOCATION);
   }
