@@ -43,7 +43,6 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     TOTAL_SUPPLY - FOUNDATION_SUPPLY - PARTNERSHIP_SUPPLY; // 75%
   uint256 internal constant WALLET_ALLOCATION = TOTAL_SUPPLY - CONTROLLER_ALLOCATION; // 25%
   uint256 internal constant MAX_RAISE_IN_USD = 5e7; // Maximum raise of $50M
-  uint256 internal constant TOKEN_PRICE_IN_CENTS = 61; // Target token price
 
   // Wei ether with two extra decimal places. Useful for conversion when we set the ether price
   uint256 internal constant WEI_PER_ETHER_TWO_DECIMALS = 1e20;
