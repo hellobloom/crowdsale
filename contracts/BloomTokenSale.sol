@@ -209,7 +209,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @dev Compute number of token units a given amount of wei gets
   //
   // @param _weiAmount Amount of wei to convert
-  function tokensFor(uint256 _weiAmount) internal returns (uint256) {
+  function tokensFor(uint256 _weiAmount) constant internal returns (uint256) {
     return _weiAmount.mul(rate).div(1e18);
   }
 
