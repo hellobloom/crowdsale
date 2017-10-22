@@ -33,8 +33,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
-    // TODO: Shouldn't be possible to finish config without setting price
-    await sale.finishConfiguration();
+    await sale.finishPresale(30000);
 
     return { sale, token };
   };
@@ -341,32 +340,6 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     ).should.be.rejectedWith("invalid opcode");
   });
 
-  it("accepts payments up until the hard cap", async function() {
-    const latestTime = latestBlockTime();
-
-    const { sale } = await createSaleWithToken(
-      latestTime + 5,
-      latestTime + 1000,
-      web3.eth.getBalance(wallet).add(new BigNumber("1000"))
-    );
-
-    timer(5);
-
-    await sale.sendTransaction({
-      value: 995,
-      from: purchaser
-    }).should.be.fulfilled;
-
-    await sale.sendTransaction({
-      value: 5,
-      from: purchaser
-    }).should.be.fulfilled;
-
-    await sale
-      .sendTransaction({ value: 5, from: purchaser })
-      .should.be.rejectedWith("invalid opcode");
-  });
-
   it("rejects payments when the sale is paused", async function() {
     const latestTime = latestBlockTime();
 
@@ -408,31 +381,44 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
   it("updates the max raise based on the USD/ETH price", async function() {
     const sale = await BloomTokenSale.new(
-      latestBlockTime() + 1,
+      latestBlockTime() + 10,
       latestBlockTime() + 500,
       new BigNumber(1000),
       wallet,
       1
     );
 
-    await sale.setEtherPriceInCents(40000);
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
+    await sale.finishPresale(40000);
+
+    await timer(10);
 
     const weiCap = await sale.cap();
     weiCap.should.be.bignumber.equal(web3.toWei(125000, "ether"));
   });
 
-  it("does not let non-owners set the USD/ETH price", async function() {
+  it("does not let non-owners finish the presale and set the price", async function() {
     const sale = await BloomTokenSale.new(
-      latestBlockTime() + 5,
-      latestBlockTime() + 10,
+      latestBlockTime() + 50,
+      latestBlockTime() + 100,
       new BigNumber(1000),
       wallet,
       1
     );
 
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
+
     await sale
-      .setEtherPriceInCents(40000, { from: investor })
+      .finishPresale(40000, { from: investor })
       .should.be.rejectedWith("invalid opcode");
+
+    await sale.finishPresale(40000).should.be.fulfilled;
   });
 
   it("updates the price of one BLT based on the USD/ETH price", async function() {
@@ -447,9 +433,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const token = await BLT.new();
     await token.changeController(sale.address);
     await sale.setToken(token.address);
-    await sale.setEtherPriceInCents(40000);
     await sale.allocateSupply();
-    await sale.finishConfiguration();
+    await sale.finishPresale(40000);
 
     await timer(5);
 
@@ -474,11 +459,10 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     const token = await BLT.new();
     await token.changeController(sale.address);
     await sale.setToken(token.address);
-    await sale.setEtherPriceInCents(40000);
     await sale.allocateSupply();
 
     const beforeSync = await sale.weiRaised();
-    await sale.finishConfiguration();
+    await sale.finishPresale(40000);
     const afterSync = await sale.weiRaised();
 
     beforeSync.should.be.bignumber.equal(0);
@@ -583,7 +567,6 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       token = await BLT.new();
       await token.changeController(sale.address);
       await sale.setToken(token.address);
-      await sale.setEtherPriceInCents(40000);
       await sale.allocateSupply();
       await token.setCanCreateGrants(sale.address, true);
     });
@@ -665,7 +648,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       );
 
       const walletTokensBefore = await token.balanceOf(wallet);
-      await sale.finishConfiguration();
+      await sale.finishPresale(40000);
       const walletTokensAfter = await token.balanceOf(wallet);
 
       walletTokensAfter

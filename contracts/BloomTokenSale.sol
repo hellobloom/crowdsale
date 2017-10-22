@@ -60,15 +60,6 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     token.generateTokens(wallet, WALLET_ALLOCATION);
   }
 
-  // @dev Configure the ether price which sets our cap and rate.
-  // @param _cents The number of cents in USD to purchase 1 ETH
-  function setEtherPriceInCents(uint256 _cents) configuration {
-    require(_cents > 10000 && _cents < 100000);
-    uint256 weiPerDollar = WEI_PER_ETHER_TWO_DECIMALS.div(_cents);
-    cap = MAX_RAISE_IN_USD.mul(weiPerDollar);
-    rate = weiPerDollar.mul(TOKEN_PRICE_IN_CENTS).div(100);
-  }
-
   // @dev low level token purchase function
   // @param _beneficiary address the tokens will be credited to
   function proxyPayment(address _beneficiary) payable whenNotPaused onlyAfterConfiguration returns (bool) {
@@ -111,11 +102,25 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     NewPresaleAllocation(_receiver, _amount);
   }
 
-  function finishConfiguration() configuration returns (bool) {
+  // @dev Set the stage for the sale:
+  //   1. Sets the `cap` controller variable based on the USD/ETH price
+  //   2. Updates the `weiRaised` to the balance of our wallet
+  //   3. Takes the unallocated portion of the advisor pool and transfers to the wallet
+  //   4. Sets the `rate` for the sale now based on the remaining tokens and cap
+  function finishPresale(uint256 _cents) configuration returns (bool) {
+    setCapFromEtherPrice(_cents);
     syncPresaleWeiRaised();
     transferUnallocatedAdvisorTokens();
     updateRateBasedOnFundsAndSupply();
-    super.finishConfiguration();
+    finishConfiguration();
+  }
+
+  // @dev Set the crowdsale cap based on the ether price
+  // @param _cents The number of cents in USD to purchase 1 ETH
+  function setCapFromEtherPrice(uint256 _cents) internal {
+    require(_cents > 10000 && _cents < 100000);
+    uint256 weiPerDollar = WEI_PER_ETHER_TWO_DECIMALS.div(_cents);
+    cap = MAX_RAISE_IN_USD.mul(weiPerDollar);
   }
 
   function syncPresaleWeiRaised() internal {

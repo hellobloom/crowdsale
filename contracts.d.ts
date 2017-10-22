@@ -45,6 +45,7 @@ export interface BloomTokenSaleInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<void>,
   cap(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  finishPresale(cents: UInt, options?: TransactionOptions): Promise<boolean>,
   unpause(options?: TransactionOptions): Promise<void>,
   weiRaised(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   onTransfer(
@@ -58,10 +59,6 @@ export interface BloomTokenSaleInstance extends ContractInstance {
   paused(options?: TransactionOptions): Promise<boolean>,
   finishConfiguration(options?: TransactionOptions): Promise<boolean>,
   startTime(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
-  setEtherPriceInCents(
-    cents: UInt,
-    options?: TransactionOptions
-  ): Promise<void>,
   pause(options?: TransactionOptions): Promise<void>,
   configured(options?: TransactionOptions): Promise<boolean>,
   isFinalized(options?: TransactionOptions): Promise<boolean>,
