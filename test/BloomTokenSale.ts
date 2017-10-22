@@ -472,10 +472,18 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("allocates vested tokens for presale purchases", async () => {
     const latestTime = latestBlockTime();
 
-    const { sale, token } = await createSaleWithToken(
+    const sale = await BloomTokenSale.new(
       latestTime + 50,
-      latestTime + 100
+      latestTime + 100,
+      new BigNumber(1000),
+      wallet,
+      1234
     );
+
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
 
     await token.setCanCreateGrants(sale.address, true);
 
@@ -496,10 +504,18 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("does not allow presale allocates after sale has started", async () => {
     const latestTime = latestBlockTime();
 
-    const { sale, token } = await createSaleWithToken(
+    const sale = await BloomTokenSale.new(
       latestTime + 50,
-      latestTime + 100
+      latestTime + 100,
+      new BigNumber(1000),
+      wallet,
+      1234
     );
+
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
 
     await token.setCanCreateGrants(sale.address, true);
 
@@ -525,10 +541,18 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
   it("allows owner to revoke token grants", async () => {
     const latestTime = latestBlockTime();
 
-    const { sale, token } = await createSaleWithToken(
+    const sale = await BloomTokenSale.new(
       latestTime + 50,
-      latestTime + 100
+      latestTime + 100,
+      new BigNumber(1000),
+      wallet,
+      1234
     );
+
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
 
     await token.changeVestingWhitelister(sale.address);
 
@@ -538,6 +562,8 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestTime + 75,
       latestTime + 125
     );
+
+    await sale.finishPresale(30000);
 
     const walletTokensBefore = await token.balanceOf(wallet);
     await timer(101);
