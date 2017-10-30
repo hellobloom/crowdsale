@@ -50,6 +50,8 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   uint256 public advisorPool = ADVISOR_SUPPLY;
 
+  uint256 internal constant DUST = 1 finney; // Minimum payment
+
   event NewPresaleAllocation(address indexed holder, uint256 bltAmount);
 
   function BloomTokenSale(
@@ -220,7 +222,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @dev validate purchases. Delegates to super method and also requires that
   //   the initial configuration phase is finished.
   function validPurchase() constant internal returns (bool) {
-    return super.validPurchase() && configured;
+    return super.validPurchase() && msg.value >= DUST && configured;
   }
 
   // @dev transfer leftover tokens to our wallet
