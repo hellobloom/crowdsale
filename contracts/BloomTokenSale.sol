@@ -223,6 +223,11 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     return super.validPurchase() && configured;
   }
 
+  // @dev transfer leftover tokens to our wallet
+  function finalization() internal {
+    token.transferFrom(address(this), wallet, token.balanceOf(address(this)));
+  }
+
   function inPresalePhase() constant beforeSale configuration internal returns (bool) {
     return true;
   }
