@@ -739,4 +739,33 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
         .should.be.rejectedWith("invalid opcode");
     });
   });
+
+  it("transfers leftover BLT to our wallet", async () => {
+    const latestTime = latestBlockTime();
+
+    const { sale, token } = await createSaleWithToken(
+      latestTime + 10,
+      latestTime + 1000
+    );
+
+    await timer(10);
+
+    await sale.sendTransaction({
+      from: investor,
+      value: new BigNumber(web3.toWei(1, "ether"))
+    });
+
+    await timer(1000);
+    const balanceBefore = await token.balanceOf(wallet);
+    const controllerBalanceBefore = await token.balanceOf(sale.address);
+    await sale.finalize();
+    const balanceAfter = await token.balanceOf(wallet);
+    const controllerBalanceAfter = await token.balanceOf(sale.address);
+
+    balanceBefore.should.be.bignumber.equal("45000000e18");
+    balanceAfter.should.be.bignumber.equal(
+      balanceBefore.add(controllerBalanceBefore)
+    );
+    controllerBalanceAfter.should.be.bignumber.equal("0");
+  });
 });
