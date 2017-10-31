@@ -60,7 +60,10 @@ contract("PlaceholderController", function([_, investor, wallet, recipient]) {
 
     await timer(5);
 
-    await sale.sendTransaction({ value: 1000, from: investor });
+    await sale.sendTransaction({
+      value: new BigNumber(web3.toWei(1, "finney")),
+      from: investor
+    });
     await token
       .transfer(recipient, 500, { from: investor })
       .should.be.rejectedWith("invalid opcode");
