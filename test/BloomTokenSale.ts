@@ -37,7 +37,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
-    await sale.finishPresale(30000);
+    await sale.finishPresale(30000, 0);
 
     return { sale, token };
   };
@@ -419,7 +419,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
-    await sale.finishPresale(40000);
+    await sale.finishPresale(40000, 0);
 
     await timer(10);
 
@@ -442,10 +442,10 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale.allocateSupply();
 
     await sale
-      .finishPresale(40000, { from: investor })
+      .finishPresale(40000, 0, { from: investor })
       .should.be.rejectedWith("invalid opcode");
 
-    await sale.finishPresale(40000).should.be.fulfilled;
+    await sale.finishPresale(40000, 0).should.be.fulfilled;
   });
 
   it("updates the price of one BLT based on the USD/ETH price", async function() {
@@ -461,7 +461,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
-    await sale.finishPresale(40000);
+    await sale.finishPresale(40000, 0);
 
     await timer(5);
 
@@ -489,11 +489,35 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale.allocateSupply();
 
     const beforeSync = await sale.weiRaised();
-    await sale.finishPresale(40000);
+    await sale.finishPresale(40000, 0);
     const afterSync = await sale.weiRaised();
 
     beforeSync.should.be.bignumber.equal(0);
     afterSync.should.be.bignumber.equal(web3.eth.getBalance(wallet));
+  });
+
+  it("supports specifying wei raised outside of wallet too", async function() {
+    const sale = await BloomTokenSale.new(
+      latestBlockTime() + 5,
+      latestBlockTime() + 10,
+      new BigNumber(1000),
+      wallet,
+      1
+    );
+
+    const token = await BLT.new();
+    await token.changeController(sale.address);
+    await sale.setToken(token.address);
+    await sale.allocateSupply();
+
+    const beforeSync = await sale.weiRaised();
+    await sale.finishPresale(40000, new BigNumber("5000e18"));
+    const afterSync = await sale.weiRaised();
+
+    beforeSync.should.be.bignumber.equal(0);
+    afterSync.should.be.bignumber.equal(
+      web3.eth.getBalance(wallet).add(new BigNumber("5000e18"))
+    );
   });
 
   it("allocates vested tokens for presale purchases", async () => {
@@ -590,7 +614,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       latestTime + 125
     );
 
-    await sale.finishPresale(30000);
+    await sale.finishPresale(30000, 0);
 
     const walletTokensBefore = await token.balanceOf(wallet);
     await timer(101);
@@ -701,7 +725,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       );
 
       const walletTokensBefore = await token.balanceOf(wallet);
-      await sale.finishPresale(40000);
+      await sale.finishPresale(40000, 0);
       const walletTokensAfter = await token.balanceOf(wallet);
 
       walletTokensAfter

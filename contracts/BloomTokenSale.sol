@@ -114,9 +114,10 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //   4. Sets the `rate` for the sale now based on the remaining tokens and cap
   //
   // @param _cents The number of cents in USD to purchase 1 ETH
-  function finishPresale(uint256 _cents) presaleOnly public returns (bool) {
+  // @param _weiRaisedOffChain Total amount of wei raised (at specified conversion rate) outside of wallet
+  function finishPresale(uint256 _cents, uint256 _weiRaisedOffChain) presaleOnly public returns (bool) {
     setCapFromEtherPrice(_cents);
-    syncPresaleWeiRaised();
+    syncPresaleWeiRaised(_weiRaisedOffChain);
     transferUnallocatedAdvisorTokens();
     updateRateBasedOnFundsAndSupply();
     finishConfiguration();
@@ -184,9 +185,9 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   }
 
   // @dev Set the `weiRaised` for this contract to the balance of the sale wallet
-  function syncPresaleWeiRaised() internal {
+  function syncPresaleWeiRaised(uint256 _weiRaisedOffChain) internal {
     require(weiRaised == 0);
-    weiRaised = wallet.balance;
+    weiRaised = wallet.balance.add(_weiRaisedOffChain);
   }
 
   // @dev Transfer unallocated advisor tokens to our wallet. Lets us sell any leftovers
