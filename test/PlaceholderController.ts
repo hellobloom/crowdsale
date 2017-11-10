@@ -56,7 +56,7 @@ contract("PlaceholderController", function([_, investor, wallet, recipient]) {
     await token.changeController(sale.address);
     await sale.setToken(token.address);
     await sale.allocateSupply();
-    await sale.finishPresale(40000);
+    await sale.finishPresale(40000, 0);
 
     await timer(5);
 

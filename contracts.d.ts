@@ -45,7 +45,6 @@ export interface BloomTokenSaleInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<void>,
   cap(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
-  finishPresale(cents: UInt, options?: TransactionOptions): Promise<boolean>,
   unpause(options?: TransactionOptions): Promise<void>,
   weiRaised(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   onTransfer(
@@ -82,6 +81,11 @@ export interface BloomTokenSaleInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<boolean>,
   allocateSupply(options?: TransactionOptions): Promise<void>,
+  finishPresale(
+    cents: UInt,
+    weiRaisedOffChain: UInt,
+    options?: TransactionOptions
+  ): Promise<boolean>,
   allocateAdvisorTokens(
     receiver: Address,
     amount: UInt,
