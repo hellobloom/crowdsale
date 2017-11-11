@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity 0.4.15;
 
 import "zeppelin/ownership/Ownable.sol";
 
@@ -16,7 +16,7 @@ contract Configurable is Ownable {
   bool public configured = false;
 
   // @dev Finalize configuration, prohibiting further configuration
-  function finishConfiguration() configuration returns (bool) {
+  function finishConfiguration() public configuration returns (bool) {
     configured = true;
     Configured();
     return true;

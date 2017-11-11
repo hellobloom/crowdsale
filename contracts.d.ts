@@ -122,6 +122,10 @@ export interface BLTInstance extends ContractInstance {
   ): Promise<BigNumber.BigNumber>,
   creationBlock(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   totalSupply(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  canCreateGrants(
+    unnamed4: Address,
+    options?: TransactionOptions
+  ): Promise<boolean>,
   setCanCreateGrants(
     addr: Address,
     allowed: boolean,
@@ -134,8 +138,8 @@ export interface BLTInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<boolean>,
   grants(
-    unnamed4: Address,
-    unnamed5: UInt,
+    unnamed5: Address,
+    unnamed6: UInt,
     options?: TransactionOptions
   ): Promise<
     [
@@ -249,6 +253,7 @@ export interface BLTInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<BigNumber.BigNumber>,
   claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
+  vestingWhitelister(options?: TransactionOptions): Promise<Address>,
   tokenFactory(options?: TransactionOptions): Promise<Address>,
   enableTransfers(
     transfersEnabled: boolean,
@@ -320,11 +325,11 @@ export interface FinalizableCrowdsaleInstance extends ContractInstance {
 export interface MathInstance extends ContractInstance {}
 
 export interface MigrationsInstance extends ContractInstance {
-  upgrade(new_address: Address, options?: TransactionOptions): Promise<void>,
-  last_completed_migration(
+  upgrade(newAddress: Address, options?: TransactionOptions): Promise<void>,
+  owner(options?: TransactionOptions): Promise<Address>,
+  lastCompletedMigration(
     options?: TransactionOptions
   ): Promise<BigNumber.BigNumber>,
-  owner(options?: TransactionOptions): Promise<Address>,
   setCompleted(completed: UInt, options?: TransactionOptions): Promise<void>
 }
 
@@ -440,6 +445,10 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
   ): Promise<BigNumber.BigNumber>,
   creationBlock(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
   totalSupply(options?: TransactionOptions): Promise<BigNumber.BigNumber>,
+  canCreateGrants(
+    unnamed7: Address,
+    options?: TransactionOptions
+  ): Promise<boolean>,
   setCanCreateGrants(
     addr: Address,
     allowed: boolean,
@@ -452,8 +461,8 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<boolean>,
   grants(
-    unnamed6: Address,
-    unnamed7: UInt,
+    unnamed8: Address,
+    unnamed9: UInt,
     options?: TransactionOptions
   ): Promise<
     [
@@ -567,6 +576,7 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<BigNumber.BigNumber>,
   claimTokens(token: Address, options?: TransactionOptions): Promise<void>,
+  vestingWhitelister(options?: TransactionOptions): Promise<Address>,
   tokenFactory(options?: TransactionOptions): Promise<Address>,
   enableTransfers(
     transfersEnabled: boolean,
@@ -600,9 +610,9 @@ export interface PausableInstance extends ContractInstance {
 
 export interface PlaceholderControllerInstance extends ContractInstance {
   onTransfer(
-    unnamed8: Address,
-    unnamed9: Address,
-    unnamed10: UInt,
+    unnamed10: Address,
+    unnamed11: Address,
+    unnamed12: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   owner(options?: TransactionOptions): Promise<Address>,
@@ -611,9 +621,9 @@ export interface PlaceholderControllerInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<void>,
   onApprove(
-    unnamed11: Address,
-    unnamed12: Address,
-    unnamed13: UInt,
+    unnamed13: Address,
+    unnamed14: Address,
+    unnamed15: UInt,
     options?: TransactionOptions
   ): Promise<boolean>,
   transferOwnership(
@@ -621,7 +631,7 @@ export interface PlaceholderControllerInstance extends ContractInstance {
     options?: TransactionOptions
   ): Promise<void>,
   proxyPayment(
-    unnamed14: Address,
+    unnamed16: Address,
     options?: TransactionOptions
   ): Promise<boolean>,
   token(options?: TransactionOptions): Promise<Address>

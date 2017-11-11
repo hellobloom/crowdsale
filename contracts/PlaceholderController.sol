@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity 0.4.15;
 
 import "./MiniMeToken.sol";
 import "./BLT.sol";
@@ -8,16 +8,16 @@ import "zeppelin/ownership/Ownable.sol";
 contract PlaceholderController is TokenController, Ownable {
   BLT public token;
 
-  function PlaceholderController(address _blt) {
+  function PlaceholderController(address _blt) public {
     token = BLT(_blt);
   }
 
-  function changeTokenController(address _newController) onlyOwner public {
+  function changeTokenController(address _newController) public onlyOwner {
     token.changeController(_newController);
   }
 
   // No buying tokens
-  function proxyPayment(address) payable public returns (bool) {
+  function proxyPayment(address) public payable returns (bool) {
     require(msg.value == 0);
     return false;
   }

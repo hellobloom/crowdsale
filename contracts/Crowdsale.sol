@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity 0.4.15;
 
 import "zeppelin/math/SafeMath.sol";
 
@@ -37,8 +37,8 @@ contract Crowdsale {
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  function Crowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) {
-    require(_startTime >= now);
+  function Crowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) public {
+    require(_startTime >= now); // solhint-disable not-rely-on-time
     require(_endTime >= _startTime);
     require(_rate > 0);
     require(_wallet != 0x0);
@@ -50,14 +50,19 @@ contract Crowdsale {
   }
 
   // fallback function can be used to buy tokens
-  function () payable {
+  function () public payable {
     proxyPayment(msg.sender);
   }
 
   // Make a payment for the provided address
   //
   // @param _owner address that will own the purchased tokens
-  function proxyPayment(address _owner) payable returns(bool);
+  function proxyPayment(address _owner) public payable returns(bool);
+
+  // @return true if crowdsale event has ended
+  function hasEnded() public constant returns (bool) {
+    return now > endTime;
+  }
 
   // send ether to the fund collection wallet
   // override to create custom fund forwarding mechanisms
@@ -70,10 +75,5 @@ contract Crowdsale {
     bool withinPeriod = now >= startTime && now <= endTime;
     bool nonZeroPurchase = msg.value != 0;
     return withinPeriod && nonZeroPurchase;
-  }
-
-  // @return true if crowdsale event has ended
-  function hasEnded() public constant returns (bool) {
-    return now > endTime;
   }
 }
