@@ -27,6 +27,7 @@
     "chai-bignumber": "^2.0.1",
     "ethereumjs-testrpc": "^4.1.1",
     "prettier": "^1.6.1",
+    "solhint": "^1.1.8",
     "solidity-coverage": "^0.2.2",
     "truffle-hdwallet-provider": "^0.0.3",
     "ts-node": "^3.3.0",

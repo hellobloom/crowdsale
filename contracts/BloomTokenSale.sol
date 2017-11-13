@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity 0.4.15;
 
 import "./MiniMeToken.sol";
 import "zeppelin/ownership/Ownable.sol";
@@ -34,6 +34,8 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
 
   BLT public token;
 
+  // Solhint breaks on combination of scientific notation and `ether` keyword so disable next line
+  // solhint-disable-next-line
   uint256 public constant TOTAL_SUPPLY = 1.5e8 ether; // 150 million BLT with 18 decimals
   uint256 internal constant FOUNDER_SUPPLY = TOTAL_SUPPLY / 5; // 20% supply
   uint256 internal constant FOUNDATION_SUPPLY = TOTAL_SUPPLY / 5; // 20% supply
@@ -60,17 +62,18 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     uint256 _rate,
     address _wallet,
     uint256 _cap
-  ) Crowdsale(_startTime, _endTime, _rate, _wallet)
-    CappedCrowdsale(_cap) { }
+  ) public
+    Crowdsale(_startTime, _endTime, _rate, _wallet)
+    CappedCrowdsale(_cap) { } // solhint-disable-line no-empty-blocks
 
   // @dev Link the token to the Crowdsale
   // @param _token address of the deployed token
-  function setToken(address _token) presaleOnly public {
+  function setToken(address _token) public presaleOnly {
     token = BLT(_token);
   }
 
   // @dev Allocate our initial token supply
-  function allocateSupply() presaleOnly public {
+  function allocateSupply() public presaleOnly {
     require(token.totalSupply() == 0);
     token.generateTokens(address(this), CONTROLLER_ALLOCATION);
     token.generateTokens(wallet, WALLET_ALLOCATION);
@@ -83,8 +86,8 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @param _cliffDate Vesting cliff
   // @param _vestingDate Date that the vesting finishes
   function allocateAdvisorTokens(address _receiver, uint256 _amount, uint64 _cliffDate, uint64 _vestingDate)
-           presaleOnly
-           public {
+           public
+           presaleOnly {
     require(_amount <= advisorPool);
     advisorPool = advisorPool.sub(_amount);
     allocatePresaleTokens(_receiver, _amount, _cliffDate, _vestingDate);
@@ -97,11 +100,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @param _cliffDate Vesting cliff
   // @param _vestingDate Date that the vesting finishes
   function allocatePresaleTokens(address _receiver, uint256 _amount, uint64 cliffDate, uint64 vestingDate)
-           presaleOnly
-           public {
+           public
+           presaleOnly {
 
     require(_amount <= 10 ** 25); // 10 million BLT. No presale partner will have more than this allocated. Prevent overflows.
 
+    // solhint-disable-next-line not-rely-on-time
     token.grantVestedTokens(_receiver, _amount, uint64(now), cliffDate, vestingDate, true, false);
 
     NewPresaleAllocation(_receiver, _amount);
@@ -115,7 +119,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //
   // @param _cents The number of cents in USD to purchase 1 ETH
   // @param _weiRaisedOffChain Total amount of wei raised (at specified conversion rate) outside of wallet
-  function finishPresale(uint256 _cents, uint256 _weiRaisedOffChain) presaleOnly public returns (bool) {
+  function finishPresale(uint256 _cents, uint256 _weiRaisedOffChain) public presaleOnly returns (bool) {
     setCapFromEtherPrice(_cents);
     syncPresaleWeiRaised(_weiRaisedOffChain);
     transferUnallocatedAdvisorTokens();
@@ -127,17 +131,18 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   //
   // @param _holder Owner of the vesting grant that is being revoked
   // @param _grantId ID of the grant being revoked
-  function revokeGrant(address _holder, uint256 _grantId) onlyOwner public {
+  function revokeGrant(address _holder, uint256 _grantId) public onlyOwner {
     token.revokeTokenGrant(_holder, wallet, _grantId);
   }
 
   // @dev low level token purchase function
   // @param _beneficiary address the tokens will be credited to
   function proxyPayment(address _beneficiary)
+    public
     payable
     whenNotPaused
     onlyAfterConfiguration
-    public returns (bool) {
+    returns (bool) {
     require(_beneficiary != 0x0);
     require(validPurchase());
 
@@ -172,7 +177,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @dev Change the token controller once the sale is over
   //
   // @param _newController Address of new token controller
-  function changeTokenController(address _newController) onlyOwner whenFinalized public {
+  function changeTokenController(address _newController) public onlyOwner whenFinalized {
     token.changeController(_newController);
   }
 
@@ -216,13 +221,13 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // @dev Compute number of token units a given amount of wei gets
   //
   // @param _weiAmount Amount of wei to convert
-  function tokensFor(uint256 _weiAmount) constant internal returns (uint256) {
+  function tokensFor(uint256 _weiAmount) internal constant returns (uint256) {
     return _weiAmount.mul(rate).div(1e18);
   }
 
   // @dev validate purchases. Delegates to super method and also requires that
   //   the initial configuration phase is finished.
-  function validPurchase() constant internal returns (bool) {
+  function validPurchase() internal constant returns (bool) {
     return super.validPurchase() && msg.value >= DUST && configured;
   }
 
@@ -231,7 +236,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
     token.transferFrom(address(this), wallet, token.balanceOf(address(this)));
   }
 
-  function inPresalePhase() constant beforeSale configuration internal returns (bool) {
+  function inPresalePhase() internal constant beforeSale configuration returns (bool) {
     return true;
   }
 
@@ -241,7 +246,7 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   }
 
   modifier beforeSale {
-    require(now < startTime);
+    require(now < startTime); // solhint-disable-line not-rely-on-time
     _;
   }
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity 0.4.15;
 
 import "./MiniMeToken.sol";
 import "zeppelin/math/SafeMath.sol";
@@ -40,8 +40,8 @@ contract MiniMeVestedToken is MiniMeToken {
 
   mapping (address => TokenGrant[]) public grants;
 
-  mapping (address => bool) canCreateGrants;
-  address vestingWhitelister;
+  mapping (address => bool) public canCreateGrants;
+  address public vestingWhitelister;
 
   modifier canTransfer(address _sender, uint _value) {
     require(spendableBalanceOf(_sender) >= _value);
@@ -61,28 +61,29 @@ contract MiniMeVestedToken is MiniMeToken {
       uint8 _decimalUnits,
       string _tokenSymbol,
       bool _transfersEnabled
-  ) MiniMeToken(_tokenFactory, _parentToken, _parentSnapShotBlock, _tokenName, _decimalUnits, _tokenSymbol, _transfersEnabled) {
+  ) public
+    MiniMeToken(_tokenFactory, _parentToken, _parentSnapShotBlock, _tokenName, _decimalUnits, _tokenSymbol, _transfersEnabled) {
     vestingWhitelister = msg.sender;
     doSetCanCreateGrants(vestingWhitelister, true);
   }
 
   // @dev Add canTransfer modifier before allowing transfer and transferFrom to go through
   function transfer(address _to, uint _value)
-           canTransfer(msg.sender, _value)
            public
+           canTransfer(msg.sender, _value)
            returns (bool success) {
     return super.transfer(_to, _value);
   }
 
   function transferFrom(address _from, address _to, uint _value)
-           canTransfer(_from, _value)
            public
+           canTransfer(_from, _value)
            returns (bool success) {
     return super.transferFrom(_from, _to, _value);
   }
 
-  function spendableBalanceOf(address _holder) constant public returns (uint) {
-    return transferableTokens(_holder, uint64(now));
+  function spendableBalanceOf(address _holder) public constant returns (uint) {
+    return transferableTokens(_holder, uint64(now)); // solhint-disable not-rely-on-time
   }
 
   /**
@@ -128,16 +129,11 @@ contract MiniMeVestedToken is MiniMeToken {
   }
 
   function setCanCreateGrants(address _addr, bool _allowed)
-           onlyVestingWhitelister public {
+           public onlyVestingWhitelister {
     doSetCanCreateGrants(_addr, _allowed);
   }
 
-  function doSetCanCreateGrants(address _addr, bool _allowed)
-           internal {
-    canCreateGrants[_addr] = _allowed;
-  }
-
-  function changeVestingWhitelister(address _newWhitelister) onlyVestingWhitelister public {
+  function changeVestingWhitelister(address _newWhitelister) public onlyVestingWhitelister {
     doSetCanCreateGrants(vestingWhitelister, false);
     vestingWhitelister = _newWhitelister;
     doSetCanCreateGrants(vestingWhitelister, true);
@@ -149,7 +145,7 @@ contract MiniMeVestedToken is MiniMeToken {
    * @param _receiver Recipient of revoked tokens.
    * @param _grantId The id of the token grant.
    */
-  function revokeTokenGrant(address _holder, address _receiver, uint256 _grantId) onlyVestingWhitelister public {
+  function revokeTokenGrant(address _holder, address _receiver, uint256 _grantId) public onlyVestingWhitelister {
     TokenGrant storage grant = grants[_holder][_grantId];
 
     require(grant.revokable);
@@ -172,7 +168,7 @@ contract MiniMeVestedToken is MiniMeToken {
    * @param _holder The holder of the grants.
    * @return A uint256 representing the total amount of grants.
    */
-  function tokenGrantsCount(address _holder) constant public returns (uint index) {
+  function tokenGrantsCount(address _holder) public constant returns (uint index) {
     return grants[_holder].length;
   }
 
@@ -197,20 +193,36 @@ contract MiniMeVestedToken is MiniMeToken {
     vested = vestedTokens(grant, uint64(now));
   }
 
-  /**
-   * @dev Get the amount of vested tokens at a specific time.
-   * @param grant TokenGrant The grant to be checked.
-   * @param time The time to be checked
-   * @return An uint256 representing the amount of vested tokens of a specific grant at a specific time.
-   */
-  function vestedTokens(TokenGrant grant, uint64 time) private constant returns (uint256) {
-    return calculateVestedTokens(
-      grant.value,
-      uint256(time),
-      uint256(grant.start),
-      uint256(grant.cliff),
-      uint256(grant.vesting)
-    );
+  // @dev The date in which all tokens are transferable for the holder
+  // Useful for displaying purposes (not used in any logic calculations)
+  function lastTokenIsTransferableDate(address holder) public constant returns (uint64 date) {
+    date = uint64(now);
+    uint256 grantIndex = tokenGrantsCount(holder);
+    for (uint256 i = 0; i < grantIndex; i++) {
+      date = grants[holder][i].vesting.max64(date);
+    }
+    return date;
+  }
+
+  // @dev How many tokens can a holder transfer at a point in time
+  function transferableTokens(address holder, uint64 time) public constant returns (uint256) {
+    uint256 grantIndex = tokenGrantsCount(holder);
+
+    if (grantIndex == 0) return balanceOf(holder); // shortcut for holder without grants
+
+    // Iterate through all the grants the holder has, and add all non-vested tokens
+    uint256 nonVested = 0;
+    for (uint256 i = 0; i < grantIndex; i++) {
+      nonVested = nonVested.add(nonVestedTokens(grants[holder][i], time));
+    }
+
+    // Balance - totalNonVested is the amount of tokens a holder can transfer at any given time
+    return balanceOf(holder).sub(nonVested);
+  }
+
+  function doSetCanCreateGrants(address _addr, bool _allowed)
+           internal {
+    canCreateGrants[_addr] = _allowed;
   }
 
   /**
@@ -274,30 +286,19 @@ contract MiniMeVestedToken is MiniMeToken {
     return grant.value.sub(vestedTokens(grant, time));
   }
 
-  // @dev The date in which all tokens are transferable for the holder
-  // Useful for displaying purposes (not used in any logic calculations)
-  function lastTokenIsTransferableDate(address holder) constant public returns (uint64 date) {
-    date = uint64(now);
-    uint256 grantIndex = tokenGrantsCount(holder);
-    for (uint256 i = 0; i < grantIndex; i++) {
-      date = grants[holder][i].vesting.max64(date);
-    }
-    return date;
-  }
-
-  // @dev How many tokens can a holder transfer at a point in time
-  function transferableTokens(address holder, uint64 time) constant public returns (uint256) {
-    uint256 grantIndex = tokenGrantsCount(holder);
-
-    if (grantIndex == 0) return balanceOf(holder); // shortcut for holder without grants
-
-    // Iterate through all the grants the holder has, and add all non-vested tokens
-    uint256 nonVested = 0;
-    for (uint256 i = 0; i < grantIndex; i++) {
-      nonVested = nonVested.add(nonVestedTokens(grants[holder][i], time));
-    }
-
-    // Balance - totalNonVested is the amount of tokens a holder can transfer at any given time
-    return balanceOf(holder).sub(nonVested);
+  /**
+   * @dev Get the amount of vested tokens at a specific time.
+   * @param grant TokenGrant The grant to be checked.
+   * @param time The time to be checked
+   * @return An uint256 representing the amount of vested tokens of a specific grant at a specific time.
+   */
+  function vestedTokens(TokenGrant grant, uint64 time) private constant returns (uint256) {
+    return calculateVestedTokens(
+      grant.value,
+      uint256(time),
+      uint256(grant.start),
+      uint256(grant.cliff),
+      uint256(grant.vesting)
+    );
   }
 }

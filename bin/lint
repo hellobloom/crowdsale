@@ -1,0 +1,10 @@
+#!/bin/bash
+
+outcome="$(./node_modules/.bin/solhint "$@")"
+
+if [ -z "$outcome" ]; then
+  echo "No violations found!"
+else
+  echo "$outcome"
+  exit 1
+fi

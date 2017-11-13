@@ -1,8 +1,8 @@
-pragma solidity ^0.4.15;
+pragma solidity 0.4.15;
 
 import "zeppelin/math/SafeMath.sol";
 import "zeppelin/ownership/Ownable.sol";
-import './Crowdsale.sol';
+import "./Crowdsale.sol";
 
 /**
  * @title FinalizableCrowdsale
@@ -20,7 +20,7 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
    * @dev Must be called after crowdsale ends, to do some extra finalization
    * work. Calls the contract's finalization function.
    */
-  function finalize() onlyOwner public {
+  function finalize() public onlyOwner {
     require(!isFinalized);
     require(hasEnded());
 
@@ -35,6 +35,5 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
    * should call super.finalization() to ensure the chain of finalization is
    * executed entirely.
    */
-  function finalization() internal {
-  }
+  function finalization() internal { } // solhint-disable no-empty-blocks
 }
