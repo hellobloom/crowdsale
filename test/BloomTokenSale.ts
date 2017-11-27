@@ -90,7 +90,7 @@ contract("BloomTokenSale", function([_, buyer, wallet, purchaser]) {
     controllerBalanceBefore.should.be.bignumber.equal(0);
 
     supplyAfter.should.be.bignumber.equal("15e25");
-    controllerBalanceAfter.should.be.bignumber.equal("11.25e25");
+    controllerBalanceAfter.should.be.bignumber.equal("8.25e25");
   });
 
   it("does not allow setting the token during the sale", async () => {
@@ -208,7 +208,7 @@ contract("BloomTokenSale", function([_, buyer, wallet, purchaser]) {
     purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
 
     purchaserTokenAllocationAfter.should.be.bignumber.equal(
-      "630378234505242022"
+      "450270167503744301"
     );
     walletBalanceAfter.should.be.bignumber.equal(
       walletBalanceBefore.plus("1000000000000000")
@@ -236,10 +236,7 @@ contract("BloomTokenSale", function([_, buyer, wallet, purchaser]) {
     purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
     purchaserTokenAllocationAfter.should.be.bignumber.equal(0);
     buyerTokenAllocationBefore.should.be.bignumber.equal(0);
-    buyerTokenAllocationAfter.should.be.bignumber.equal(
-      // "630378230720701868"
-      "630378238289782221"
-    );
+    buyerTokenAllocationAfter.should.be.bignumber.equal("450270170206987301");
   });
 
   it("rejects proxy payments for a null address", async function() {
@@ -471,7 +468,7 @@ contract("BloomTokenSale", function([_, buyer, wallet, purchaser]) {
     });
 
     const buyerBalance = await token.balanceOf(buyer);
-    buyerBalance.should.be.bignumber.equal("1282025682082899059");
+    buyerBalance.should.be.bignumber.equal("915732630059213613");
   });
 
   it("supports syncing weiRaised with wallet for presale purchases", async function() {
@@ -622,7 +619,7 @@ contract("BloomTokenSale", function([_, buyer, wallet, purchaser]) {
 
     const walletTokensAfter = await token.balanceOf(wallet);
     // Timing of revoke makes it tough to get the exact amount revoked
-    walletTokensBefore.should.be.bignumber.equal("4.5e25");
+    walletTokensBefore.should.be.bignumber.equal("7.5e25");
     walletTokensAfter
       .sub(walletTokensBefore)
       .should.be.bignumber.greaterThan(850);
@@ -800,7 +797,7 @@ contract("BloomTokenSale", function([_, buyer, wallet, purchaser]) {
     const balanceAfter = await token.balanceOf(wallet);
     const controllerBalanceAfter = await token.balanceOf(sale.address);
 
-    balanceBefore.should.be.bignumber.equal("45000000e18");
+    balanceBefore.should.be.bignumber.equal("75000000e18");
     balanceAfter.should.be.bignumber.equal(
       balanceBefore.add(controllerBalanceBefore)
     );

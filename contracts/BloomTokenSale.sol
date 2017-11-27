@@ -37,13 +37,12 @@ contract BloomTokenSale is CappedCrowdsale, Ownable, TokenController, Pausable, 
   // Solhint breaks on combination of scientific notation and `ether` keyword so disable next line
   // solhint-disable-next-line
   uint256 public constant TOTAL_SUPPLY = 1.5e8 ether; // 150 million BLT with 18 decimals
-  uint256 internal constant FOUNDER_SUPPLY = TOTAL_SUPPLY / 5; // 20% supply
-  uint256 internal constant FOUNDATION_SUPPLY = TOTAL_SUPPLY / 5; // 20% supply
+  uint256 internal constant FOUNDATION_SUPPLY = (TOTAL_SUPPLY * 4) / 10; // 40% supply
   uint256 internal constant ADVISOR_SUPPLY = TOTAL_SUPPLY / 20; // 5% supply
   uint256 internal constant PARTNERSHIP_SUPPLY = TOTAL_SUPPLY / 20; // 5% supply
   uint256 internal constant CONTROLLER_ALLOCATION =
-    TOTAL_SUPPLY - FOUNDATION_SUPPLY - PARTNERSHIP_SUPPLY; // 75%
-  uint256 internal constant WALLET_ALLOCATION = TOTAL_SUPPLY - CONTROLLER_ALLOCATION; // 25%
+    TOTAL_SUPPLY - FOUNDATION_SUPPLY - PARTNERSHIP_SUPPLY; // 55%
+  uint256 internal constant WALLET_ALLOCATION = TOTAL_SUPPLY - CONTROLLER_ALLOCATION; // 45%
   uint256 internal constant MAX_RAISE_IN_USD = 5e7; // Maximum raise of $50M
 
   // Wei ether with two extra decimal places. Useful for conversion when we set the ether price
