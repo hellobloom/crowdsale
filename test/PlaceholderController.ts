@@ -16,7 +16,7 @@ const BloomTokenSale = artifacts.require("BloomTokenSale");
 const PlaceholderController = artifacts.require("PlaceholderController");
 const BLT = artifacts.require("BLT");
 
-contract("PlaceholderController", function([_, investor, wallet, recipient]) {
+contract("PlaceholderController", function([_, buyer, wallet, recipient]) {
   // timer for tests specific to testrpc
   const timer = async (s: any) => {
     return new Promise((resolve, reject) => {
@@ -62,10 +62,10 @@ contract("PlaceholderController", function([_, investor, wallet, recipient]) {
 
     await sale.sendTransaction({
       value: new BigNumber(web3.toWei(1, "finney")),
-      from: investor
+      from: buyer
     });
     await token
-      .transfer(recipient, 500, { from: investor })
+      .transfer(recipient, 500, { from: buyer })
       .should.be.rejectedWith("invalid opcode");
 
     await timer(25);
@@ -73,7 +73,7 @@ contract("PlaceholderController", function([_, investor, wallet, recipient]) {
     await sale.finalize();
     await sale.changeTokenController(placeholder.address);
     await token.transfer(recipient, 500, {
-      from: investor
+      from: buyer
     }).should.be.fulfilled;
   });
 });
