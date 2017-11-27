@@ -19,7 +19,7 @@ function dust() {
   return new BigNumber(web3.toWei(1, "finney"));
 }
 
-contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
+contract("BloomTokenSale", function([_, buyer, wallet, purchaser]) {
   const createSaleWithToken = async function(
     startTime: number,
     endTime: number,
@@ -226,17 +226,17 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     timer(5);
 
     const purchaserTokenAllocationBefore = await token.balanceOf(purchaser);
-    const investorTokenAllocationBefore = await token.balanceOf(investor);
+    const buyerTokenAllocationBefore = await token.balanceOf(buyer);
 
-    await sale.proxyPayment(investor, { value: dust(), from: purchaser });
+    await sale.proxyPayment(buyer, { value: dust(), from: purchaser });
 
     const purchaserTokenAllocationAfter = await token.balanceOf(purchaser);
-    const investorTokenAllocationAfter = await token.balanceOf(investor);
+    const buyerTokenAllocationAfter = await token.balanceOf(buyer);
 
     purchaserTokenAllocationBefore.should.be.bignumber.equal(0);
     purchaserTokenAllocationAfter.should.be.bignumber.equal(0);
-    investorTokenAllocationBefore.should.be.bignumber.equal(0);
-    investorTokenAllocationAfter.should.be.bignumber.equal(
+    buyerTokenAllocationBefore.should.be.bignumber.equal(0);
+    buyerTokenAllocationAfter.should.be.bignumber.equal(
       // "630378230720701868"
       "630378238289782221"
     );
@@ -268,10 +268,10 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await await sale.sendTransaction({ value: dust(), from: purchaser });
 
     token
-      .transfer(investor, 5, { from: purchaser })
+      .transfer(buyer, 5, { from: purchaser })
       .should.be.rejectedWith("invalid opcode");
 
-    token.transfer(investor, 5, { from: sale }).should.be.fulfilled;
+    token.transfer(buyer, 5, { from: sale }).should.be.fulfilled;
   });
 
   it("does not allow anyone to spend other account's tokens", async function() {
@@ -290,11 +290,11 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     });
 
     token
-      .approve(investor, 5, { from: purchaser })
+      .approve(buyer, 5, { from: purchaser })
       .should.be.rejectedWith("invalid opcode");
 
     token
-      .approve(investor, 5, { from: sale })
+      .approve(buyer, 5, { from: sale })
       .should.be.rejectedWith("invalid opcode");
   });
 
@@ -442,7 +442,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await sale.allocateSupply();
 
     await sale
-      .finishPresale(40000, 0, { from: investor })
+      .finishPresale(40000, 0, { from: buyer })
       .should.be.rejectedWith("invalid opcode");
 
     await sale.finishPresale(40000, 0).should.be.fulfilled;
@@ -467,11 +467,11 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     await await sale.sendTransaction({
       value: new BigNumber("1525000000000000"), // $0.61 worth of ETH at $400/ETH rate
-      from: investor
+      from: buyer
     });
 
-    const investorBalance = await token.balanceOf(investor);
-    investorBalance.should.be.bignumber.equal("1282025682082899059");
+    const buyerBalance = await token.balanceOf(buyer);
+    buyerBalance.should.be.bignumber.equal("1282025682082899059");
   });
 
   it("supports syncing weiRaised with wallet for presale purchases", async function() {
@@ -539,16 +539,16 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.setCanCreateGrants(sale.address, true);
 
     await sale.allocatePresaleTokens(
-      investor,
+      buyer,
       5000,
       latestBlockTime() + 10000,
       latestBlockTime() + 100000
     ).should.be.fulfilled;
 
-    const investorBalance = await token.balanceOf(investor);
-    const spendableBalance = await token.spendableBalanceOf(investor);
+    const buyerBalance = await token.balanceOf(buyer);
+    const spendableBalance = await token.spendableBalanceOf(buyer);
 
-    investorBalance.should.be.bignumber.equal(5000);
+    buyerBalance.should.be.bignumber.equal(5000);
     spendableBalance.should.be.bignumber.equal(0);
   });
 
@@ -571,7 +571,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.setCanCreateGrants(sale.address, true);
 
     await sale.allocatePresaleTokens(
-      investor,
+      buyer,
       1,
       latestBlockTime() + 10000,
       latestBlockTime() + 100000
@@ -581,7 +581,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     await sale
       .allocatePresaleTokens(
-        investor,
+        buyer,
         1,
         latestBlockTime() + 10000,
         latestBlockTime() + 100000
@@ -608,7 +608,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await token.changeVestingWhitelister(sale.address);
 
     await sale.allocatePresaleTokens(
-      investor,
+      buyer,
       5000,
       latestTime + 75,
       latestTime + 125
@@ -618,7 +618,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     const walletTokensBefore = await token.balanceOf(wallet);
     await timer(101);
-    await sale.revokeGrant(investor, 0);
+    await sale.revokeGrant(buyer, 0);
 
     const walletTokensAfter = await token.balanceOf(wallet);
     // Timing of revoke makes it tough to get the exact amount revoked
@@ -652,30 +652,30 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       const advisorPoolBefore = await sale.advisorPool();
 
       await sale.allocateAdvisorTokens(
-        investor,
+        buyer,
         new BigNumber("1e24"),
         latestBlockTime() + 10000,
         latestBlockTime() + 100000
       );
 
       const advisorPoolAfter = await sale.advisorPool();
-      const investorBalance = await token.balanceOf(investor);
+      const buyerBalance = await token.balanceOf(buyer);
 
       advisorPoolBefore.should.be.bignumber.equal("7.5e24");
-      investorBalance.should.be.bignumber.equal("1e24");
+      buyerBalance.should.be.bignumber.equal("1e24");
       advisorPoolAfter.should.be.bignumber.equal("6.5e24");
     });
 
     it("rejects advisor allocations once the pool has been emptied", async () => {
       await sale.allocateAdvisorTokens(
-        investor,
+        buyer,
         new BigNumber("3.75e24"),
         latestBlockTime() + 10000,
         latestBlockTime() + 100000
       ).should.be.fulfilled;
 
       await sale.allocateAdvisorTokens(
-        investor,
+        buyer,
         new BigNumber("3.75e24"),
         latestBlockTime() + 10000,
         latestBlockTime() + 100000
@@ -683,7 +683,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
       await sale
         .allocateAdvisorTokens(
-          investor,
+          buyer,
           1,
           latestBlockTime() + 10000,
           latestBlockTime() + 100000
@@ -693,14 +693,14 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     it("rejects advisor allocations if the pool does not have enough funds left", async () => {
       await sale.allocateAdvisorTokens(
-        investor,
+        buyer,
         new BigNumber("3e24"),
         latestBlockTime() + 10000,
         latestBlockTime() + 100000
       ).should.be.fulfilled;
 
       await sale.allocateAdvisorTokens(
-        investor,
+        buyer,
         new BigNumber("3e24"),
         latestBlockTime() + 10000,
         latestBlockTime() + 100000
@@ -708,7 +708,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
       await sale
         .allocateAdvisorTokens(
-          investor,
+          buyer,
           new BigNumber("3e24"),
           latestBlockTime() + 10000,
           latestBlockTime() + 100000
@@ -718,7 +718,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
 
     it("transfers unallocated advisor tokens to the wallet", async () => {
       await sale.allocateAdvisorTokens(
-        investor,
+        buyer,
         new BigNumber("3e24"),
         latestBlockTime() + 10000,
         latestBlockTime() + 100000
@@ -767,7 +767,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
       await sale.finalize();
 
       await sale
-        .changeTokenController("0x0", { from: investor })
+        .changeTokenController("0x0", { from: buyer })
         .should.be.rejectedWith("invalid opcode");
     });
 
@@ -789,7 +789,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     await timer(10);
 
     await sale.sendTransaction({
-      from: investor,
+      from: buyer,
       value: new BigNumber(web3.toWei(1, "ether"))
     });
 

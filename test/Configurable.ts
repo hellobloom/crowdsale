@@ -11,7 +11,7 @@ const should = chai
   .use(chaiBignumber(web3.BigNumber))
   .should();
 
-contract("Configurable", function([_, _investor, _wallet, purchaser]) {
+contract("Configurable", function([_, _buyer, _wallet, purchaser]) {
   before(async function() {
     //Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
     await advanceBlock();
