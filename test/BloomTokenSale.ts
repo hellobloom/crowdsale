@@ -625,7 +625,7 @@ contract("BloomTokenSale", function([_, investor, wallet, purchaser]) {
     walletTokensBefore.should.be.bignumber.equal("4.5e25");
     walletTokensAfter
       .sub(walletTokensBefore)
-      .should.be.bignumber.greaterThan(900);
+      .should.be.bignumber.greaterThan(850);
   });
 
   describe("allocating tokens to advisors", async () => {
