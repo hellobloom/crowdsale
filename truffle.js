@@ -3,10 +3,12 @@ var HDWalletProvider = require("truffle-hdwallet-provider");
 var mnemonic =
   "rent notice region deal good lucky fee indicate inject fit melody animal teach twice region";
 
-const ropstenProvider = new HDWalletProvider(
+const rinkebyProvider = new HDWalletProvider(
   mnemonic,
-  "https://ropsten.infura.io/"
+  "https://rinkeby.infura.io/"
 );
+
+console.log(rinkebyProvider);
 
 require("babel-register");
 require("babel-polyfill");
@@ -23,11 +25,12 @@ module.exports = {
       provider: require("ethereumjs-testrpc").provider({ gasLimit: 1e7 }),
       network_id: "*"
     },
-    ropsten: {
-      network_id: 3,
-      provider: ropstenProvider,
-      gasPrice: "500000000000",
-      gasLimit: "2000000000000000000"
+    rinkeby: {
+      network_id: 4,
+      provider: rinkebyProvider,
+      gasPrice: "20000000000",
+      gasLimit: "4704624",
+      gas: "4704624"
     }
   }
 };
