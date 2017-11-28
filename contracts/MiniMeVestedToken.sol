@@ -15,7 +15,7 @@ import "zeppelin/math/Math.sol";
 // @dev MiniMeVestedToken is a combination of the MiniMeToken adding the ability to
 // createTokenGrants and revokeTokenGrants from VestedToken by OpenZeppelin.
 //
-// You can think of this contact as being a merging of VestedToken and MiniMeToken
+// You can think of this contract as being a merging of VestedToken and MiniMeToken
 // that makes small modifications for checking and altering balance so that the two
 // separate contracts interoperate properly.
 //

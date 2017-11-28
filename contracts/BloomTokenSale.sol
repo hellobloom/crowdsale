@@ -25,7 +25,7 @@ import "./BLT.sol";
  *     2. Public sale (purchasing tokens from this contract, approving transfers)
  *     3. Finalization (changing to our placeholder controller)
  *
- *   This contract is only available to the public for phase 2. The `Configurable` and `FinaliableCrowdsale`
+ *   This contract is only available to the public for phase 2. The `Configurable` and `FinalizableCrowdsale`
  *   contracts enforce the invariant that we can only advance phases (e.g. from presale to public sale) but
  *   we can never go back and we can't call functions from previous phases once we have left them.
  */
