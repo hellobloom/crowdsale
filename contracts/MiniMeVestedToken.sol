@@ -105,7 +105,6 @@ contract MiniMeVestedToken is MiniMeToken {
   ) public {
     // Check start, cliff and vesting are properly order to ensure correct functionality of the formula.
     require(_cliff >= _start);
-    require(_vesting >= _start);
     require(_vesting >= _cliff);
 
     require(canCreateGrants[msg.sender]);
