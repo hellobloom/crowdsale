@@ -133,6 +133,7 @@ contract MiniMeVestedToken is MiniMeToken {
   }
 
   function changeVestingWhitelister(address _newWhitelister) public onlyVestingWhitelister {
+    require(_newWhitelister != 0);
     doSetCanCreateGrants(vestingWhitelister, false);
     vestingWhitelister = _newWhitelister;
     doSetCanCreateGrants(vestingWhitelister, true);
@@ -145,6 +146,8 @@ contract MiniMeVestedToken is MiniMeToken {
    * @param _grantId The id of the token grant.
    */
   function revokeTokenGrant(address _holder, address _receiver, uint256 _grantId) public onlyVestingWhitelister {
+    require(_receiver != 0);
+
     TokenGrant storage grant = grants[_holder][_grantId];
 
     require(grant.revokable);
