@@ -4,6 +4,7 @@ require("babel-polyfill");
 var MiniMeTokenFactory = artifacts.require("MiniMeTokenFactory");
 var BLT = artifacts.require("./BLT.sol");
 var BloomTokenSale = artifacts.require("./BloomTokenSale.sol");
+var PlaceholderController = artifacts.require("./PlaceholderController.sol");
 
 module.exports = function deploy(deployer) {
   if (process.env.CI === "true") {
@@ -48,6 +49,9 @@ module.exports = function deploy(deployer) {
           })
           .then(() => {
             return sale.allocateSupply();
+          })
+          .then(() => {
+            deployer.deploy(PlaceholderController, bloom.address);
           })
           .catch(console.log);
       })
