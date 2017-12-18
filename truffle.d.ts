@@ -4,7 +4,8 @@ import {
   BloomTokenSaleInstance,
   MiniMeTokenInstance,
   MiniMeVestedTokenInstance,
-  PlaceholderControllerInstance
+  PlaceholderControllerInstance,
+  BloomPriceAdjustmentControllerInstance
 } from "./contracts";
 
 declare global {
@@ -82,9 +83,20 @@ interface ConfigurableMockInstance extends ContractInstance, Ownable {
   decrement(...args: any[]): any;
 }
 
+interface MockBLTInstance extends BLTInstance {
+  gift(recipient: Address, options?: TransactionOptions): Promise<void>;
+}
+
+interface MockBLTContract extends Contract<MockBLTInstance> {
+  new (): Promise<MockBLTInstance>;
+}
+
 interface Artifacts {
   require(name: "MiniMeVestedToken"): Contract<MiniMeVestedTokenInstance>;
   require(name: "BloomTokenSale"): Contract<BloomTokenSaleInstance>;
+  require(
+    name: "BloomPriceAdjustmentController"
+  ): Contract<BloomPriceAdjustmentControllerInstance>;
   require(
     name: "PlaceholderController"
   ): Contract<PlaceholderControllerInstance>;
@@ -94,4 +106,5 @@ interface Artifacts {
   ): Contract<ConfigurableMockInstance>;
   require(name: "./helpers/MockSale"): Contract<MockSaleInstance>;
   require(name: "./helpers/MockToken"): Contract<MockTokenInstance>;
+  require(name: "./helpers/MockBLT"): Contract<MockBLTInstance>;
 }
