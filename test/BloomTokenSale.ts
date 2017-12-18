@@ -613,11 +613,11 @@ contract("BloomTokenSale", function([_, buyer, wallet, purchaser]) {
 
     await sale.finishPresale(30000, 0);
 
-    const walletTokensBefore = await token.balanceOf(wallet);
+    const walletTokensBefore = await token.balanceOf.call(wallet);
     await timer(101);
     await sale.revokeGrant(buyer, 0);
 
-    const walletTokensAfter = await token.balanceOf(wallet);
+    const walletTokensAfter = await token.balanceOf.call(wallet);
     // Timing of revoke makes it tough to get the exact amount revoked
     walletTokensBefore.should.be.bignumber.equal("7.5e25");
     walletTokensAfter
@@ -791,11 +791,11 @@ contract("BloomTokenSale", function([_, buyer, wallet, purchaser]) {
     });
 
     await timer(1000);
-    const balanceBefore = await token.balanceOf(wallet);
-    const controllerBalanceBefore = await token.balanceOf(sale.address);
+    const balanceBefore = await token.balanceOf.call(wallet);
+    const controllerBalanceBefore = await token.balanceOf.call(sale.address);
     await sale.finalize();
-    const balanceAfter = await token.balanceOf(wallet);
-    const controllerBalanceAfter = await token.balanceOf(sale.address);
+    const balanceAfter = await token.balanceOf.call(wallet);
+    const controllerBalanceAfter = await token.balanceOf.call(sale.address);
 
     balanceBefore.should.be.bignumber.equal("75000000e18");
     balanceAfter.should.be.bignumber.equal(
