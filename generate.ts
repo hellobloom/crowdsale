@@ -33,8 +33,10 @@ type SolidityType =
   | "address[]"
   | "bool"
   | "bytes"
+  | "bytes32"
   | "string"
   | "uint8"
+  | "uint16"
   | "uint64"
   | "uint256"
   | "uint256[]";
@@ -46,7 +48,7 @@ interface FunctionMemberInput {
 
 type Member = ConstructorMember | EventMember | FunctionMember | FallbackMember;
 
-type Abi = (EventMember | FunctionMember)[];
+type Abi = (EventMember | FunctionMember | ConstructorMember)[];
 
 interface Definition {
   contract_name: string;
@@ -88,6 +90,14 @@ function buildContract(definition: Definition) {
     export interface ${definition.contract_name}Instance extends ContractInstance {
       ${buildMembers(definition.abi)}
     }
+
+    export interface ${definition.contract_name}Contract {
+      new: (${buildConstructorArguments(
+        definition.abi
+      )}) => Promise<${definition.contract_name}Instance>;
+      deployed(): Promise<${definition.contract_name}Instance>;
+      at(address: string): ${definition.contract_name}Instance;
+    }
   `;
 }
 
@@ -110,6 +120,16 @@ function buildMember(member: Member): string {
   }
 }
 
+function buildConstructorArguments(abi: Abi): string {
+  const constructorMember = abi.find(member => member.type === "constructor");
+
+  if (!constructorMember) {
+    return "";
+  }
+
+  return constructorMember.inputs.map(buildFunctionArgument).join(", ");
+}
+
 function buildFunctionMember(member: FunctionMember) {
   let args = member.inputs.map(buildFunctionArgument).join(", ");
 
@@ -117,9 +137,11 @@ function buildFunctionMember(member: FunctionMember) {
     args += ", ";
   }
 
-  return `${member.name}(${args}options?: TransactionOptions): ${translateOutputs(
-    member.outputs
-  )};`;
+  const functionSignature = `(${args}options?: TransactionOptions)`;
+  return `${member.name}: {
+    ${functionSignature}: Promise<Web3.TransactionReceipt>;
+    call${functionSignature}: ${translateOutputs(member.outputs)};
+  }`;
 }
 
 function translateOutputs(outputs: FunctionMemberInput[]) {
@@ -127,7 +149,7 @@ function translateOutputs(outputs: FunctionMemberInput[]) {
   if (outputs.length === 1) {
     valueType = translateOutput(outputs[0]);
   } else if (outputs.length === 0) {
-    valueType = "void";
+    valueType = "Web3.TransactionReceipt";
   } else {
     valueType = `[${outputs.map(translateOutput).join(", ")}]`;
   }
@@ -171,7 +193,10 @@ function translateType(type: SolidityType, options = { UInt: "UInt" }): string {
       return "boolean";
     case "bytes":
       return "string";
+    case "bytes32":
+      return "string";
     case "uint8":
+    case "uint16":
     case "uint64":
     case "uint256":
       return options.UInt;
