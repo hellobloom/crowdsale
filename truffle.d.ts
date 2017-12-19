@@ -85,6 +85,7 @@ interface ConfigurableMockInstance extends ContractInstance, Ownable {
 
 interface MockBLTInstance extends BLTInstance {
   gift(recipient: Address, options?: TransactionOptions): Promise<void>;
+  bigGift(recipient: Address, options?: TransactionOptions): Promise<void>;
 }
 
 interface MockBLTContract extends Contract<MockBLTInstance> {

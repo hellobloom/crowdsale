@@ -55,6 +55,15 @@ export interface BloomPriceAdjustmentControllerInstance
     (options?: TransactionOptions): Promise<Web3.TransactionReceipt>;
     call(options?: TransactionOptions): Promise<BigNumber.BigNumber>;
   };
+  grantAdditionalTokensToBuyer: {
+    (buyer: Address, options?: TransactionOptions): Promise<
+      Web3.TransactionReceipt
+    >;
+    call(
+      buyer: Address,
+      options?: TransactionOptions
+    ): Promise<Web3.TransactionReceipt>;
+  };
   onTransfer: {
     (
       from: Address,
@@ -79,18 +88,18 @@ export interface BloomPriceAdjustmentControllerInstance
     >;
     call(unnamed1: Address, options?: TransactionOptions): Promise<boolean>;
   };
-  owner: {
-    (options?: TransactionOptions): Promise<Web3.TransactionReceipt>;
-    call(options?: TransactionOptions): Promise<Address>;
-  };
-  grantAdditionalTokens: {
-    (buyer: Address, options?: TransactionOptions): Promise<
+  grantAdditionalTokensToBatch: {
+    (buyers: Address[], options?: TransactionOptions): Promise<
       Web3.TransactionReceipt
     >;
     call(
-      buyer: Address,
+      buyers: Address[],
       options?: TransactionOptions
     ): Promise<Web3.TransactionReceipt>;
+  };
+  owner: {
+    (options?: TransactionOptions): Promise<Web3.TransactionReceipt>;
+    call(options?: TransactionOptions): Promise<Address>;
   };
   changeTokenController: {
     (newController: Address, options?: TransactionOptions): Promise<

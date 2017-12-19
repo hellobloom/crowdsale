@@ -8,6 +8,18 @@ contract MockBLT is BLT {
   function MockBLT() BLT(address(this)) {
   }
 
+  function bigGift(address _recipient) returns (bool) {
+    uint curTotalSupply = totalSupply();
+    require(curTotalSupply + 1e20 >= curTotalSupply); // Check for overflow
+    uint previousBalanceTo = balanceOf(_recipient);
+    require(previousBalanceTo + 1e20 >= previousBalanceTo); // Check for overflow
+    updateValueAtNow(totalSupplyHistory, curTotalSupply + 1e20);
+    updateValueAtNow(balances[_recipient], previousBalanceTo + 1e20);
+    Transfer(0, _recipient, 1e20);
+    Gift(_recipient);
+    return true;
+  }
+
   function gift(address _recipient) returns (bool) {
     uint curTotalSupply = totalSupply();
     require(curTotalSupply + 1e18 >= curTotalSupply); // Check for overflow

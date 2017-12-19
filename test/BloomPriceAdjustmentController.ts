@@ -1,5 +1,7 @@
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
+import * as _ from "lodash";
+const walletGenerator = require("ethereumjs-wallet");
 import { MockBLTInstance } from "../truffle";
 import { BloomPriceAdjustmentControllerInstance } from "../contracts";
 
@@ -31,7 +33,7 @@ contract("BloomPriceAdjustmentController", function([alice, bob, wallet]) {
   it("gives a contributor more BLT based on their balance", async () => {
     (await blt.balanceOf(alice)).should.be.bignumber.equal("1e18");
 
-    await controller.grantAdditionalTokens(alice);
+    await controller.grantAdditionalTokensToBuyer(alice);
 
     (await blt.balanceOf.call(alice)).should.be.bignumber.equal(
       "1068381926722368730"
@@ -39,9 +41,9 @@ contract("BloomPriceAdjustmentController", function([alice, bob, wallet]) {
   });
 
   it("prevents me from granting additional tokens to someone twice", async () => {
-    await controller.grantAdditionalTokens(alice).should.be.fulfilled;
+    await controller.grantAdditionalTokensToBuyer(alice).should.be.fulfilled;
     await controller
-      .grantAdditionalTokens(alice)
+      .grantAdditionalTokensToBuyer(alice)
       .should.be.rejectedWith("invalid opcode");
   });
 
@@ -95,9 +97,42 @@ contract("BloomPriceAdjustmentController", function([alice, bob, wallet]) {
     (await blt.balanceOf(wallet)).should.be.bignumber.equal("2e18");
   });
 
-  it("only lets the owner call the grantAdditionalTokens function", async () => {
+  it("only lets the owner call the grantAdditionalTokensToBuyer function", async () => {
     await controller
-      .grantAdditionalTokens(alice, { from: bob })
+      .grantAdditionalTokensToBuyer(alice, { from: bob })
       .should.be.rejectedWith("invalid opcode");
+  });
+
+  describe("batching adjustments to reduce gas costs", async () => {
+    const generateBLTOwners = async (count: number) => {
+      const owners = _.times(count, () =>
+        walletGenerator.generate().getChecksumAddressString()
+      );
+      await Promise.all(owners.map(user => blt.gift(user)));
+      return owners;
+    };
+
+    it("supports batching additional token grants", async () => {
+      const owners = await generateBLTOwners(10);
+      await blt.bigGift(controller.address);
+
+      await controller.grantAdditionalTokensToBatch(owners).should.be.fulfilled;
+    });
+
+    it("requires way less gas than doing each transaction individually", async () => {
+      const owners = await generateBLTOwners(50);
+      await blt.bigGift(controller.address);
+
+      const batchedGasTotal = await (controller.grantAdditionalTokensToBatch as any).estimateGas(
+        owners
+      );
+      const singleGasTotal = await (controller.grantAdditionalTokensToBuyer as any).estimateGas(
+        owners[0]
+      );
+      const cumulativeSingleGasTotal = singleGasTotal * 50;
+
+      batchedGasTotal.should.be.below(4200000);
+      cumulativeSingleGasTotal.should.be.above(5100000);
+    });
   });
 });

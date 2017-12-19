@@ -17,8 +17,8 @@ import "./BLT.sol";
 //
 // This contract keeps transfer and approve calls disabled from everyone, so setting it
 // as the token controller after the sale will preserve the balances from the token sale.
-// A separate script should be setup that calls `grantAdditionalTokens` for every contributor
-// that was not part of the presale (they will be handled separately).
+// A separate script should be setup that calls `grantAdditionalTokensToBuyer` for every
+// contributor that was not part of the presale (they will be handled separately).
 //
 // Tokens can be transfered to this controller from our wallet in order to fund the balance
 // changes. Any leftovers will be sent back to the wallet once this controller is phased out.
@@ -37,9 +37,19 @@ contract BloomPriceAdjustmentController is Ownable, TokenController {
     wallet = _wallet;
   }
 
+  // Issue additional tokens to a batch of buyers. Issuing in batches reduces total costs
+  // for Bloom in terms of Gas. It should also be a bit easier for book keeping to make sure
+  // 100 batched transactions go through vs. 5000 individual transactions
+  // @param _buyers array of buyers that will be passed to grantAdditionalTokensToBuyer
+  function grantAdditionalTokensToBatch(address[] _buyers) public onlyOwner {
+    for (uint256 i = 0; i < _buyers.length; i++) {
+      grantAdditionalTokensToBuyer(_buyers[i]);
+    }
+  }
+
   // Issue a one time balance update to anyone that contributed in the public sale.
   // @param _buyer Address of token sale contributor who should be issued additional tokens
-  function grantAdditionalTokens(address _buyer) public onlyOwner {
+  function grantAdditionalTokensToBuyer(address _buyer) public onlyOwner {
     require(!updatedAccounts[_buyer]);
 
     uint256 balanceOfBuyer = token.balanceOf(_buyer);
