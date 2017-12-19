@@ -49,6 +49,111 @@ export interface ApproveAndCallFallBackContract {
   at(address: string): ApproveAndCallFallBackInstance;
 }
 
+export interface BloomPriceAdjustmentControllerInstance
+  extends ContractInstance {
+  PERCENT_INCREASE: {
+    (options?: TransactionOptions): Promise<Web3.TransactionReceipt>;
+    call(options?: TransactionOptions): Promise<BigNumber.BigNumber>;
+  };
+  grantAdditionalTokensToBuyer: {
+    (buyer: Address, options?: TransactionOptions): Promise<
+      Web3.TransactionReceipt
+    >;
+    call(
+      buyer: Address,
+      options?: TransactionOptions
+    ): Promise<Web3.TransactionReceipt>;
+  };
+  onTransfer: {
+    (
+      from: Address,
+      to: Address,
+      unnamed0: UInt,
+      options?: TransactionOptions
+    ): Promise<Web3.TransactionReceipt>;
+    call(
+      from: Address,
+      to: Address,
+      unnamed0: UInt,
+      options?: TransactionOptions
+    ): Promise<boolean>;
+  };
+  wallet: {
+    (options?: TransactionOptions): Promise<Web3.TransactionReceipt>;
+    call(options?: TransactionOptions): Promise<Address>;
+  };
+  updatedAccounts: {
+    (unnamed1: Address, options?: TransactionOptions): Promise<
+      Web3.TransactionReceipt
+    >;
+    call(unnamed1: Address, options?: TransactionOptions): Promise<boolean>;
+  };
+  grantAdditionalTokensToBatch: {
+    (buyers: Address[], options?: TransactionOptions): Promise<
+      Web3.TransactionReceipt
+    >;
+    call(
+      buyers: Address[],
+      options?: TransactionOptions
+    ): Promise<Web3.TransactionReceipt>;
+  };
+  owner: {
+    (options?: TransactionOptions): Promise<Web3.TransactionReceipt>;
+    call(options?: TransactionOptions): Promise<Address>;
+  };
+  changeTokenController: {
+    (newController: Address, options?: TransactionOptions): Promise<
+      Web3.TransactionReceipt
+    >;
+    call(
+      newController: Address,
+      options?: TransactionOptions
+    ): Promise<Web3.TransactionReceipt>;
+  };
+  onApprove: {
+    (
+      unnamed2: Address,
+      unnamed3: Address,
+      unnamed4: UInt,
+      options?: TransactionOptions
+    ): Promise<Web3.TransactionReceipt>;
+    call(
+      unnamed2: Address,
+      unnamed3: Address,
+      unnamed4: UInt,
+      options?: TransactionOptions
+    ): Promise<boolean>;
+  };
+  transferOwnership: {
+    (newOwner: Address, options?: TransactionOptions): Promise<
+      Web3.TransactionReceipt
+    >;
+    call(
+      newOwner: Address,
+      options?: TransactionOptions
+    ): Promise<Web3.TransactionReceipt>;
+  };
+  proxyPayment: {
+    (unnamed5: Address, options?: TransactionOptions): Promise<
+      Web3.TransactionReceipt
+    >;
+    call(unnamed5: Address, options?: TransactionOptions): Promise<boolean>;
+  };
+  token: {
+    (options?: TransactionOptions): Promise<Web3.TransactionReceipt>;
+    call(options?: TransactionOptions): Promise<Address>;
+  };
+}
+
+export interface BloomPriceAdjustmentControllerContract {
+  new: (
+    token: Address,
+    wallet: Address
+  ) => Promise<BloomPriceAdjustmentControllerInstance>;
+  deployed(): Promise<BloomPriceAdjustmentControllerInstance>;
+  at(address: string): BloomPriceAdjustmentControllerInstance;
+}
+
 export interface BloomTokenSaleInstance extends ContractInstance {
   advisorPool: {
     (options?: TransactionOptions): Promise<Web3.TransactionReceipt>;
@@ -97,13 +202,13 @@ export interface BloomTokenSaleInstance extends ContractInstance {
     (
       from: Address,
       to: Address,
-      unnamed0: UInt,
+      unnamed6: UInt,
       options?: TransactionOptions
     ): Promise<Web3.TransactionReceipt>;
     call(
       from: Address,
       to: Address,
-      unnamed0: UInt,
+      unnamed6: UInt,
       options?: TransactionOptions
     ): Promise<boolean>;
   };
@@ -174,15 +279,15 @@ export interface BloomTokenSaleInstance extends ContractInstance {
   };
   onApprove: {
     (
-      unnamed1: Address,
-      unnamed2: Address,
-      unnamed3: UInt,
+      unnamed7: Address,
+      unnamed8: Address,
+      unnamed9: UInt,
       options?: TransactionOptions
     ): Promise<Web3.TransactionReceipt>;
     call(
-      unnamed1: Address,
-      unnamed2: Address,
-      unnamed3: UInt,
+      unnamed7: Address,
+      unnamed8: Address,
+      unnamed9: UInt,
       options?: TransactionOptions
     ): Promise<boolean>;
   };
@@ -297,10 +402,10 @@ export interface BLTInstance extends ContractInstance {
     call(options?: TransactionOptions): Promise<BigNumber.BigNumber>;
   };
   canCreateGrants: {
-    (unnamed4: Address, options?: TransactionOptions): Promise<
+    (unnamed10: Address, options?: TransactionOptions): Promise<
       Web3.TransactionReceipt
     >;
-    call(unnamed4: Address, options?: TransactionOptions): Promise<boolean>;
+    call(unnamed10: Address, options?: TransactionOptions): Promise<boolean>;
   };
   setCanCreateGrants: {
     (addr: Address, allowed: boolean, options?: TransactionOptions): Promise<
@@ -327,12 +432,14 @@ export interface BLTInstance extends ContractInstance {
     ): Promise<boolean>;
   };
   grants: {
-    (unnamed5: Address, unnamed6: UInt, options?: TransactionOptions): Promise<
-      Web3.TransactionReceipt
-    >;
+    (
+      unnamed11: Address,
+      unnamed12: UInt,
+      options?: TransactionOptions
+    ): Promise<Web3.TransactionReceipt>;
     call(
-      unnamed5: Address,
-      unnamed6: UInt,
+      unnamed11: Address,
+      unnamed12: UInt,
       options?: TransactionOptions
     ): Promise<
       [
@@ -1127,10 +1234,10 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     call(options?: TransactionOptions): Promise<BigNumber.BigNumber>;
   };
   canCreateGrants: {
-    (unnamed7: Address, options?: TransactionOptions): Promise<
+    (unnamed13: Address, options?: TransactionOptions): Promise<
       Web3.TransactionReceipt
     >;
-    call(unnamed7: Address, options?: TransactionOptions): Promise<boolean>;
+    call(unnamed13: Address, options?: TransactionOptions): Promise<boolean>;
   };
   setCanCreateGrants: {
     (addr: Address, allowed: boolean, options?: TransactionOptions): Promise<
@@ -1157,12 +1264,14 @@ export interface MiniMeVestedTokenInstance extends ContractInstance {
     ): Promise<boolean>;
   };
   grants: {
-    (unnamed8: Address, unnamed9: UInt, options?: TransactionOptions): Promise<
-      Web3.TransactionReceipt
-    >;
+    (
+      unnamed14: Address,
+      unnamed15: UInt,
+      options?: TransactionOptions
+    ): Promise<Web3.TransactionReceipt>;
     call(
-      unnamed8: Address,
-      unnamed9: UInt,
+      unnamed14: Address,
+      unnamed15: UInt,
       options?: TransactionOptions
     ): Promise<
       [
@@ -1499,15 +1608,15 @@ export interface PausableContract {
 export interface PlaceholderControllerInstance extends ContractInstance {
   onTransfer: {
     (
-      unnamed10: Address,
-      unnamed11: Address,
-      unnamed12: UInt,
+      unnamed16: Address,
+      unnamed17: Address,
+      unnamed18: UInt,
       options?: TransactionOptions
     ): Promise<Web3.TransactionReceipt>;
     call(
-      unnamed10: Address,
-      unnamed11: Address,
-      unnamed12: UInt,
+      unnamed16: Address,
+      unnamed17: Address,
+      unnamed18: UInt,
       options?: TransactionOptions
     ): Promise<boolean>;
   };
@@ -1526,15 +1635,15 @@ export interface PlaceholderControllerInstance extends ContractInstance {
   };
   onApprove: {
     (
-      unnamed13: Address,
-      unnamed14: Address,
-      unnamed15: UInt,
+      unnamed19: Address,
+      unnamed20: Address,
+      unnamed21: UInt,
       options?: TransactionOptions
     ): Promise<Web3.TransactionReceipt>;
     call(
-      unnamed13: Address,
-      unnamed14: Address,
-      unnamed15: UInt,
+      unnamed19: Address,
+      unnamed20: Address,
+      unnamed21: UInt,
       options?: TransactionOptions
     ): Promise<boolean>;
   };
@@ -1548,10 +1657,10 @@ export interface PlaceholderControllerInstance extends ContractInstance {
     ): Promise<Web3.TransactionReceipt>;
   };
   proxyPayment: {
-    (unnamed16: Address, options?: TransactionOptions): Promise<
+    (unnamed22: Address, options?: TransactionOptions): Promise<
       Web3.TransactionReceipt
     >;
-    call(unnamed16: Address, options?: TransactionOptions): Promise<boolean>;
+    call(unnamed22: Address, options?: TransactionOptions): Promise<boolean>;
   };
   token: {
     (options?: TransactionOptions): Promise<Web3.TransactionReceipt>;
