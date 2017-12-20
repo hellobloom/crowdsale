@@ -5,7 +5,9 @@ import {
   MiniMeTokenInstance,
   MiniMeVestedTokenInstance,
   PlaceholderControllerInstance,
-  BloomPriceAdjustmentControllerInstance
+  BloomPriceAdjustmentControllerInstance,
+  TokenVestingInstance,
+  TokenVestingContract
 } from "./contracts";
 
 declare global {
@@ -108,4 +110,5 @@ interface Artifacts {
   require(name: "./helpers/MockSale"): Contract<MockSaleInstance>;
   require(name: "./helpers/MockToken"): Contract<MockTokenInstance>;
   require(name: "./helpers/MockBLT"): Contract<MockBLTInstance>;
+  require(name: "TokenVesting"): TokenVestingContract;
 }

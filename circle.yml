@@ -11,4 +11,4 @@ test:
   override:
     - bin/compile-typings && git diff --exit-code
     - bin/test
-    - git ls-files contracts | grep -v 'MiniMeToken.sol' | xargs bin/lint
+    - git ls-files contracts | egrep -v '(MiniMeToken|TokenVesting).sol' | xargs bin/lint

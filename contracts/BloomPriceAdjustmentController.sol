@@ -2,6 +2,7 @@ pragma solidity 0.4.15;
 
 import "zeppelin/math/SafeMath.sol";
 import "zeppelin/ownership/Ownable.sol";
+import "./TokenVesting.sol";
 import "./MiniMeToken.sol";
 import "./BLT.sol";
 
@@ -29,12 +30,35 @@ contract BloomPriceAdjustmentController is Ownable, TokenController {
   BLT public token;
   uint256 public constant PERCENT_INCREASE = 68381926722368730; // 18 decimals so 6.83% increase
   mapping(address => bool) public updatedAccounts;
+  TokenVesting[] public vestingVehicles;
+
+  uint256 public constant SALE_START_TIME = 1511974800;
 
   event BalanceUpdate(address indexed recipient, uint256 value);
 
   function BloomPriceAdjustmentController(BLT _token, address _wallet) public {
     token = _token;
     wallet = _wallet;
+  }
+
+  // Grant tokens that don't have any lockup period. Uses the lockup internal functionality for consistency
+  function grantNoLockupPresaleTokens(address _recipient, uint256 _amount) public onlyOwner returns (TokenVesting) {
+    return grantLockupTokens(_recipient, _amount, 0);
+  }
+
+  // Grant tokens that can be unlocked 3 months after the sale
+  function grantThreeMonthLockupTokens(address _recipient, uint256 _amount) public onlyOwner returns (TokenVesting) {
+    return grantLockupTokens(_recipient, _amount, 90 days);
+  }
+
+  // Grant tokens that can be unlocked 6 months after the sale
+  function grantSixMonthLockupTokens(address _recipient, uint256 _amount) public onlyOwner returns (TokenVesting) {
+    return grantLockupTokens(_recipient, _amount, 182 days);
+  }
+
+  // Grant tokens that can be unlocked 12 months after the sale
+  function grantOneYearLockupTokens(address _recipient, uint256 _amount) public onlyOwner returns (TokenVesting) {
+    return grantLockupTokens(_recipient, _amount, 1 years);
   }
 
   // Issue additional tokens to a batch of buyers. Issuing in batches reduces total costs
@@ -88,5 +112,14 @@ contract BloomPriceAdjustmentController is Ownable, TokenController {
   //   is disabled during the price adjustmet period
   function onApprove(address, address, uint) public returns (bool) {
     return false;
+  }
+
+  // Grant presale or advisor tokens via a TokenVesting vehicle
+  function grantLockupTokens(address _recipient, uint256 _amount, uint256 _duration) private returns (TokenVesting) {
+    TokenVesting vestingVehicle = new TokenVesting(_recipient, SALE_START_TIME, _duration, _duration, true);
+    token.transfer(address(vestingVehicle), _amount);
+    vestingVehicles.push(vestingVehicle);
+    
+    return vestingVehicle;
   }
 }

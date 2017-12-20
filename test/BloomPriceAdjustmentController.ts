@@ -1,9 +1,13 @@
+import * as Web3 from "web3";
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as _ from "lodash";
 const walletGenerator = require("ethereumjs-wallet");
 import { MockBLTInstance } from "../truffle";
-import { BloomPriceAdjustmentControllerInstance } from "../contracts";
+import {
+  BloomPriceAdjustmentControllerInstance,
+  Transaction
+} from "../contracts";
 
 const chaiBignumber = require("chai-bignumber");
 
@@ -15,6 +19,7 @@ chai
 const BloomPriceAdjustmentController = artifacts.require(
   "BloomPriceAdjustmentController"
 );
+const TokenVesting = artifacts.require("TokenVesting");
 const MockBLT = artifacts.require("./helpers/MockBLT");
 
 contract("BloomPriceAdjustmentController", function([alice, bob, wallet]) {
@@ -133,6 +138,70 @@ contract("BloomPriceAdjustmentController", function([alice, bob, wallet]) {
 
       batchedGasTotal.should.be.below(4200000);
       cumulativeSingleGasTotal.should.be.above(5100000);
+    });
+  });
+
+  describe("presale token grants", async () => {
+    type TPresaleTokenFunction = {
+      (
+        recipient: string,
+        amount: number | BigNumber.BigNumber,
+        options?: Partial<Transaction> | undefined
+      ): Promise<
+        Web3.TransactionReceipt<{ [key: string]: string | BigNumber.BigNumber }>
+      >;
+      call(
+        recipient: string,
+        amount: number | BigNumber.BigNumber,
+        options?: Partial<Transaction> | undefined
+      ): Promise<string>;
+    };
+
+    const assertPresaleTokenFunction = async (
+      presaleFunction: TPresaleTokenFunction,
+      expectedVestingEnd: string
+    ) => {
+      const vehicle = await presaleFunction.call(
+        alice,
+        new web3.BigNumber("1e18")
+      );
+
+      await presaleFunction(alice, new web3.BigNumber("1e18"));
+
+      (await blt.balanceOf(vehicle)).should.be.bignumber.equal("1e18");
+
+      const duration = await TokenVesting.at(vehicle).duration.call();
+      const vestingStart = await TokenVesting.at(vehicle).start.call();
+
+      vestingStart.add(duration).should.be.bignumber.equal(expectedVestingEnd);
+    };
+
+    it("creates a token vesting contract and transfers tokens to it", async () => {
+      await assertPresaleTokenFunction(
+        controller.grantNoLockupPresaleTokens,
+        "1511974800"
+      );
+    });
+
+    it("creates a 3 month lockup contract and transfers tokens to it", async () => {
+      await assertPresaleTokenFunction(
+        controller.grantThreeMonthLockupTokens,
+        "1519750800"
+      );
+    });
+
+    it("creates a 6 month lockup contract and transfers tokens to it", async () => {
+      await assertPresaleTokenFunction(
+        controller.grantSixMonthLockupTokens,
+        "1527699600"
+      );
+    });
+
+    it("creates a 6 month lockup contract and transfers tokens to it", async () => {
+      await assertPresaleTokenFunction(
+        controller.grantOneYearLockupTokens,
+        "1543510800"
+      );
     });
   });
 });
